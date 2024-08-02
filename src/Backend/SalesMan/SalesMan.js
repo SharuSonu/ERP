@@ -120,6 +120,61 @@ router.put('/update-Salesman', async (req, res) => {
     }
 });
 
+// Function to  Delete Salesman 
+async function DeleteSalesman(reqBody) {
+    const {  id, databaseName } = reqBody;
+
+    if (!id || !databaseName) {
+        
+        throw new Error("Invalid input: 'id' and 'databaseName' are required fields");
+    }
+
+    const dbNamePrefix = "ERP_";
+    const dbName = dbNamePrefix + databaseName.toLowerCase().replace(/\s+/g, '_');
+
+    let connection;
+    try {
+        connection = await mysql.createConnection({ ...dbConfig, database: dbName });
+        await connection.beginTransaction();
+
+        const [updateResult] = await connection.query(`
+            DELETE FROM Salesman 
+            WHERE id = ?
+        `, [id]);
+
+        await connection.commit();
+
+        return updateResult.affectedRows;
+    } catch (err) {
+        if (connection) {
+            await connection.rollback();
+        }
+        console.error('Error:', err);
+        throw err;
+    } finally {
+        if (connection) {
+            await connection.end();
+        }
+    }
+}
+
+// PUT endpoint to delete a group
+router.put('/delete-Salesman', async (req, res) => {
+    try {
+        //console.log("api req:", req.body);
+        const affectedRows = await DeleteSalesman(req.body);
+        if (affectedRows === 0) {
+            res.status(404).json({ success: false, message: 'SalesMan not found' });
+        } else {
+            res.status(200).json({ success: true, message: 'SalesMan Deleted successfully' });
+        }
+    } catch (error) {
+        console.error('Error Deleting group:', error);
+        res.status(500).json({ success: false, message: 'Error Deleting Salesman', error: error.message });
+    }
+});
+
+
 
 
 
