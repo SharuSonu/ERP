@@ -294,6 +294,18 @@ export const UpdateSalesman = async (companyName) => {
   }
 };
 
+export const DeleteSalesman = async (companyName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/delete-Salesman`, {
+      params: { companyName: companyName } // Pass companyName as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
 export const createGodown = async (data) => {
   try {
     const response = await axios.post(`${BASE_URL}/create-Godown`, data, {

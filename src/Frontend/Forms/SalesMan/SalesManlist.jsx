@@ -30,6 +30,8 @@ const SalesmanList = ({ onSelectSalesman }) => {
 
   const [editSalesmanId, setEditSalesmanId] = useState(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [deleteSalesmanId, setdeleteSalesmanId] = useState(null);
+  const [deleteModalVisible, setdeleteModalVisible] = useState(false);
 
   // State variables for salesman details
   const [SalesManName, setSalesManName] = useState('');
@@ -111,6 +113,35 @@ useEffect(() => {
       }
     }, [editSalesmanId]);
 
+    useEffect(() => {
+      const fetchSalesmanFromDatabase = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5000/api/Salesman_delete/${deleteSalesmanId}`, {
+            params: {
+              companyName: companyName,
+            }
+          });
+          console.log('Response from API:', response.data); 
+          if (response.data) {
+            const { SalesManName, SalesManNumber, SalesManEmailId } = response.data;
+            setSalesManName(SalesManName);
+            setSalesManNumber(SalesManNumber);
+            setSalesManEmailId(SalesManEmailId);
+            setdeleteModalVisible(true);
+          } else {
+            console.error('Failed to fetch Salesman details:', response.data.message);
+          }
+        } catch (error) {
+          console.error('Error fetching Salesman details from database:', error);
+        }
+      };
+      if (deleteSalesmanId) {
+          fetchSalesmanFromDatabase();
+        }
+      }, [deleteSalesmanId]);
+  
+
+
     const handlePageChange = (page) => {
         setCurrentPage(page);
       };
@@ -155,7 +186,7 @@ useEffect(() => {
           <Button
             type="default"
             className="delete-button mr-2"
-            onClick={() => confirmDelete(record.id)}
+            onClick={() => opendeleteModal(record.id)}
           >
             Delete
           </Button>
@@ -184,14 +215,22 @@ useEffect(() => {
     setSalesManEmailId('');
   };
 
-  const confirmDelete = (SalesmanId) => {
-    Modal.confirm({
-      title: 'Are you sure delete this SalesMan?',
-      content: 'This action cannot be undone.',
-      onOk() {
-        console.log(`Delete Group with ID: ${SalesmanId}`);
-      }
-    });
+  const opendeleteModal = (SalesmanId) => {
+    const Salesmans = Salesman.find(Salesman => Salesman.id === SalesmanId);
+    if (Salesmans) {
+      setdeleteSalesmanId(SalesmanId);
+      setSalesManName(Salesmans.SalesManName);
+      setSalesManNumber(Salesmans.SalesManNumber);
+      setSalesManEmailId(Salesmans.SalesManEmailId);
+      setdeleteModalVisible(true);
+    }
+  };
+
+  
+  const closedeleteModal = () => {
+    setdeleteSalesmanId(null);
+    setdeleteModalVisible(false);
+    
   };
 
   //Modal Submit
@@ -216,6 +255,33 @@ useEffect(() => {
       }
     } catch (error) {
       console.error('Error updating Salesman:', error);
+      // Handle network error or other exceptions
+    }
+  };
+
+
+   //Modal Submit
+   const handleSubmitdelete = async() => {
+    try {
+      const response = await axios.put(`http://localhost:5000/api/delete-Salesman`, {
+        SalesManName: SalesManName,       // Assuming groupName, groupAlias, and parentGroup are defined states
+        SalesManNumber: SalesManNumber,
+        SalesManEmailId: SalesManEmailId,
+        id : deleteSalesmanId,
+        databaseName:companyName
+      });
+
+      if (response.data.success) {
+        message.success('SalesMan Deleted successfully!');
+        console.log('SalesMan Deleted successfully');
+        refreshSalesmanList();
+        closedeleteModal();
+      } else {
+        console.error('Failed to delete SalesMan:', response.data.message);
+        // Handle error condition as needed
+      }
+    } catch (error) {
+      console.error('Error deleting Salesman:', error);
       // Handle network error or other exceptions
     }
   };
@@ -319,6 +385,16 @@ useEffect(() => {
         </Form>
       </Modal>
 
+      <Modal
+        title={`Delete Salesman ID: ${deleteSalesmanId}`}
+        visible={deleteModalVisible}
+        onCancel={closedeleteModal}
+        footer={[
+          <Button key="cancel" onClick={closedeleteModal}>Cancel</Button>,
+          <Button key="submit" type="primary" onClick={handleSubmitdelete}>ok</Button>,
+        ]}
+      >
+</Modal>
       <Divider />
     </div>
   );

@@ -1522,6 +1522,48 @@ app.get('/api/Salesman_edit/:editSalesmanId', async (req, res) => {
 });
 
 
+app.get('/api/Salesman_delete/:deleteSalesmanId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { deleteSalesmanId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        const sql = 'SELECT * FROM Salesman WHERE id = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [deleteSalesmanId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Salesman not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
 
 app.get('/api/groups_delete/:deleteGroupId', async (req, res) => {
     const { companyName } = req.query;
