@@ -118,9 +118,9 @@ const Sidebar = ({ onPageChange, isSidebarCollapsed, toggleSidebar }) => {
             <a href="#" className="submenu-item" onClick={() => handlePageChange('AllQuotes')}>
               Quotes <BiPlus className="plus-icon" onClick={(e) => { e.stopPropagation(); handlePageChange('QuotesCreation'); }} />
             </a>
-            <a href="#" className="submenu-item" onClick={() => handlePageChange('ALLSalesOrder')}>
+             {/*<a href="#" className="submenu-item" onClick={() => handlePageChange('ALLSalesOrder')}>
               Sales Orders <BiPlus className="plus-icon" onClick={(e) => { e.stopPropagation(); handlePageChange('SalesOrdrersCreation'); }} />
-            </a>
+            </a>*/}
             <a href="#" className="submenu-item" onClick={() => handlePageChange('DeliveryChallans')}>
               Delivery Challans <BiPlus className="plus-icon" onClick={(e) => { e.stopPropagation(); handlePageChange('DeliveryChallansCreation'); }} />
             </a>
