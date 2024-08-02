@@ -133,9 +133,9 @@ const Sidebar = ({ onPageChange, isSidebarCollapsed, toggleSidebar }) => {
             <a href="#" className="submenu-item" onClick={() => handlePageChange('DeliveryNotes')}>
               Delivery Notes <BiPlus className="plus-icon" onClick={(e) => { e.stopPropagation(); handlePageChange('DeliveryNotesCreation'); }} />
             </a>
-            <a href="#" className="submenu-item" onClick={() => handlePageChange('PackingSlips')}>
+            {/*<a href="#" className="submenu-item" onClick={() => handlePageChange('PackingSlips')}>
               Packing Slips <BiPlus className="plus-icon" onClick={(e) => { e.stopPropagation(); handlePageChange('PackingSlipsCreation'); }} />
-            </a>
+            </a>*/}
           </div>
         )}
         <div className="item" onClick={() => toggleMenu('purchaseOpen')}>
