@@ -1,0 +1,36 @@
+/* QuoteForm.css */
+
+.quote-form {
+    font-family: Arial, sans-serif;
+    max-width: 100%;
+    background-color: #e2f6fc;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.quote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.quote-header h3 {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+}
+
+.close-icon {
+    cursor: pointer;
+    font-size: 20px;
+    color: #999;
+}
+
+.close-icon:hover {
+    color: #666;
+}

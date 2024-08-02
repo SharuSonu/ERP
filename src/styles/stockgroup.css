@@ -1,0 +1,45 @@
+.stock-group-form {
+    padding: 20px;
+    border: 1px solid #ebedf0;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  
+  .stock-group-form h4 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .stock-group-form h5 {
+    font-size: 16px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .stock-group-form .ant-divider-horizontal {
+    margin: 20px 0;
+  }
+  
+  .stock-group-form .ant-form-item-label {
+    font-weight: bold;
+  }
+  
+  .stock-group-form .ant-form-item-explain {
+    color: #f5222d;
+  }
+  
+  .stock-group-form .ant-select-selector,
+  .stock-group-form .ant-input {
+    width: 100%;
+  }
+  
+  .stock-group-form .ant-btn {
+    width: 100%;
+  }
+  
+  .stock-group-form .ant-divider {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 20px 0;
+  }
+  
