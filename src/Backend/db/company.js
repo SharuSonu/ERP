@@ -423,6 +423,27 @@ router.post('/create-db', async (req, res) => {
                 openingBalanceValue float DEFAULT NULL,
                 PRIMARY KEY (id)
               )`);
+
+               // Create the Simple_details table exists
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS Simple_details (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                Symbolname VARCHAR(255),
+                Formalname VARCHAR(255),
+                QUCname VARCHAR(255),
+                Decimalnum DECIMAL(10, 2)
+            )
+        `);
+
+        // Create the Compoundunits_details table exists
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS Compoundunits_details (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                Firstunit VARCHAR(225),
+                NumValue VARCHAR(225),
+                Secondunit VARCHAR(225)
+            )
+        `);
              
              
               //tax_voucherapproval
