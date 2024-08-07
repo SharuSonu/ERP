@@ -95,7 +95,7 @@ const Sidebar = ({ onPageChange, isSidebarCollapsed, toggleSidebar }) => {
                 <a href="#" className="submenu-item" onClick={() => handlePageChange('ProductList')}>
                   Stock Item <BiPlus className="plus-icon" onClick={(e) => { e.stopPropagation(); handlePageChange('StockItemCreation'); }} />
                 </a>
-                <a href="#" className="submenu-item" onClick={() => handlePageChange('Unit')}>
+                <a href="#" className="submenu-item" onClick={() => handlePageChange('Unitslist')}>
                   Unit <BiPlus className="plus-icon" onClick={(e) => { e.stopPropagation(); handlePageChange('UnitsCreation'); }} />
                 </a>
                 <a href="#" className="submenu-item" onClick={() => handlePageChange('GodownList')}>

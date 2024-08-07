@@ -7,6 +7,7 @@ import QuoteCreationForm from '../Forms/Quote/QuoteCreationForm';
 import StockItemForm from '../Forms/StockItem/StockItemForm';
 import StockItemDetail from '../Forms/StockItem/StockItemDetail';
 import UnitsCreationForm from '../Forms/Units/UnitsForm';
+import Unitslist from '../Forms/Units/Unitslist';
 import StockGroupForm from '../Forms/StockGroup/StockGroup';
 import GroupForm from '../Forms/Group/GroupForm';
 import StockCategoryForm from '../Forms/StockCategory/StockCategoryForm';
@@ -69,6 +70,8 @@ const Content = () => {
         return <div>Inventory</div>;
       case 'UnitsCreation':
         return <UnitsCreationForm />;
+      case 'Unitslist':
+        return <Unitslist/>;
       case 'StockItemCreation':
         return <StockItemForm />;
       case 'ProductList':
