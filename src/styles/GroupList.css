@@ -110,7 +110,116 @@
   
   .edit-button {
     background-color: #1890ff; /* Red color for Edit button */
-    color: #fff;
+    color: #fff;.unit-list {
+      padding: 20px;
+      background-color: #faf4f4;
+      text-align: center; /* Center all text content */
+    }
+    
+    .unit-list h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    
+    .unit-list h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    
+    .unit-list .ant-input-search {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 20px; /* Center the search input */
+    }
+    
+    .unit-list .ant-table {
+      margin: 0 auto 20px; /* Center the table */
+      border-collapse: collapse; /* Collapse borders for a cleaner look */
+      width: 100%; /* Ensure table takes full width */
+    }
+    
+    /* Table header */
+    .unit-list .ant-table-thead > tr > th {
+      background: #f0f0f0; /* Light grey background for headers */
+      color: #333; /* Dark text color for contrast */
+      font-weight: bold; /* Bold text for emphasis */
+      padding: 12px 8px; /* Padding for better spacing */
+      text-align: left; /* Align text to the left */
+      border-bottom: 2px solid #e0e0e0; /* Bottom border for separation */
+    }
+    
+    /* Table body */
+    .unit-list .ant-table-tbody > tr > td {
+      padding: 12px 8px; /* Padding for cells */
+      border-bottom: 1px solid #e0e0e0; /* Bottom border for separation */
+      color: #333; /* Text color for cells */
+    }
+    
+    /* Hover effect for table rows */
+    .unit-list .ant-table-tbody > tr:hover {
+      background: #fafafa; /* Slightly darker background on hover */
+    }
+    
+    /* Buttons in the table */
+    .unit-list .ant-btn {
+      margin-right: 10px;
+    }
+    
+    /* Edit button styling */
+    .unit-list .edit-button {
+      color: #f2f6fb; /* Light color for edit button */
+      background-color: #1890ff; /* Primary color background */
+      border: none; /* Remove default border */
+      padding: 6px 12px; /* Padding for better button size */
+    }
+    
+    /* Delete button styling */
+    .unit-list .delete-button {
+      color: #ec1115; /* Red color for delete button */
+      background-color: #fff; /* White background */
+      border: 1px solid #ec1115; /* Red border */
+      padding: 6px 12px; /* Padding for better button size */
+    }
+    
+    /* Pagination styling */
+    .unit-list .ant-pagination {
+      margin-top: 20px;
+      text-align: center; /* Center pagination controls */
+    }
+    
+    /* Modal title */
+    .unit-list .ant-modal-title {
+      font-size: 18px; /* Font size for modal title */
+    }
+    
+    /* Modal footer */
+    .unit-list .ant-modal-footer {
+      display: flex;
+      justify-content: center; /* Center footer content */
+    }
+    
+    /* Form item labels */
+    .unit-list .ant-form-item-label > label {
+      font-weight: 600; /* Bold labels */
+    }
+    
+    /* Form items */
+    .unit-list .ant-form-item {
+      margin-bottom: 15px; /* Space between form items */
+    }
+    
+    /* Checkbox group */
+    .unit-list .ant-checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center; /* Center the checkbox group */
+    }
+    
+    .unit-list .ant-checkbox-group > .ant-checkbox-wrapper {
+      flex: 1 1 120px; /* Flex basis for checkbox wrappers */
+    }
+    
     border: none;
   }
   
