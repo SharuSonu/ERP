@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Form, Input, Button, Select, Divider,message } from 'antd';
 //import { createStockcategory, fetchStockcategory } from '../../utils/RestApi'; // Assuming correct import path
 import { AppContext } from '../../../Context/AppContext';
+import '../../../styles/StockcategForm.css';
 
 
 const { Option } = Select;
@@ -71,7 +72,7 @@ const onFinishFailed = (errorInfo) => {
 
   return (
     <div className="stock-category-form">
-      <h4>Stock Category Creation</h4>
+      <h4>𝑺𝒕𝒐𝒄𝒌 𝑪𝒂𝒕𝒆𝒈𝒐𝒓𝒚 𝑪𝒓𝒆𝒂𝒕𝒊𝒐𝒏</h4>
       <Divider />
 
       <Form

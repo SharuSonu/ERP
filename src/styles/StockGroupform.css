@@ -1,0 +1,141 @@
+/* StockGroupForm.css */
+
+.stock-group-form {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 700px;
+    margin: 20px auto;
+    box-sizing: border-box; /* Ensure padding doesn't affect width */
+  }
+  
+  .stock-group-form h4 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  
+  .stock-group-form h5 {
+    font-size: 18px;
+    color: #555;
+    margin-bottom: 12px;
+  }
+  
+  .ant-divider {
+    margin: 16px 0;
+    border-color: #e0e0e0;
+  }
+  
+  .ant-form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  .ant-form-item-label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .ant-input,
+  .ant-select-selector,
+  .ant-date-picker {
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    padding: 8px 12px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  
+  .ant-input:focus,
+  .ant-select-selector:focus,
+  .ant-date-picker-focused {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.2);
+  }
+  
+  .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+    color: #fff;
+    border-radius: 4px;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  
+  .ant-btn-primary:hover {
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+  }
+  
+  .ant-btn-primary:focus,
+  .ant-btn-primary:active {
+    background-color: #096dd9;
+    border-color: #096dd9;
+  }
+  
+  @media (max-width: 1200px) {
+    .stock-group-form {
+      padding: 15px;
+    }
+  
+    .ant-form-item {
+      margin-bottom: 14px;
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .stock-group-form {
+      padding: 10px;
+    }
+  
+    .ant-form-item {
+      margin-bottom: 12px;
+    }
+  
+    .ant-form-item-label {
+      font-size: 16px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .stock-group-form {
+      padding: 10px;
+    }
+  
+    .ant-form {
+      padding: 15px;
+    }
+  
+    .ant-form-item {
+      margin-bottom: 10px;
+    }
+  
+    .ant-form-item-label {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .stock-group-form {
+      padding: 8px;
+    }
+  
+    .ant-form {
+      padding: 10px;
+    }
+  
+    .ant-form-item {
+      margin-bottom: 8px;
+    }
+  
+    .ant-form-item-label {
+      font-size: 12px;
+    }
+  }
+  

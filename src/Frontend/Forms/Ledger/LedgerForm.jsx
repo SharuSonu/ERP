@@ -233,7 +233,7 @@ const handleOpeningBalanceChange = (e) => {
 
     return (
         <div className="Ledform-container">
-            <h4>Ledger Creation</h4>
+            <h4>𝑳𝒆𝒅𝒈𝒆𝒓 𝑪𝒓𝒆𝒂𝒕𝒊𝒐𝒏</h4>
             <Divider />
 
             <Form

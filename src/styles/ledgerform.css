@@ -1,60 +1,195 @@
-/* ledgerform.css */
+/* LedgerForm.css */
 
-.form-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0; 
-  border: none;
+.Ledform-container {
+  padding: 20px;
+  background-color: #f4f4f4;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  margin: 20px auto;
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
-h2 {
-  font-size: 1.5rem;
+.Ledform-container h4 {
+  font-size: 24px;
+  color: #333;
   margin-bottom: 20px;
+  text-align: center;
 }
 
-.form-group {
-  margin-bottom: 20px;
+.ant-form {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 100%; /* Allow form to be responsive */
+  box-sizing: border-box; /* Ensure padding doesn't affect width */
 }
 
-label {
-  display: block;
-  
+.ant-form-item {
+  margin-bottom: 16px; /* Reduced margin for better spacing */
 }
 
 .ant-form-item-label {
-  text-align: left;
+  font-weight: bold;
+  color: #555;
 }
 
-.ant-form-item-control-input-content {
-  display: flex;
-}
-
-.ant-form-item-control {
-  flex: 1;
-}
-
-.ant-select {
-  width: 100%;
-}
-
-.ant-input {
-  width: 100%;
-}
-
-.ant-input-group-addon {
-  flex: 1;
-}
-
-button[type='submit'] {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
+.ant-input,
+.ant-select-selector,
+.ant-date-picker {
   border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease; /* Add transition for smoother hover effect */
+  border: 1px solid #d9d9d9;
+  padding: 8px 12px;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-button[type='submit']:hover {
-  background-color: #0056b3;
+.ant-input:focus,
+.ant-select-selector:focus,
+.ant-date-picker-focused {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.2);
+}
+
+.ant-btn-primary {
+  background-color: #1890ff;
+  border-color: #1890ff;
+  color: #fff;
+  border-radius: 4px;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.ant-btn-primary:hover {
+  background-color: #40a9ff;
+  border-color: #40a9ff;
+}
+
+.ant-btn-primary:focus,
+.ant-btn-primary:active {
+  background-color: #096dd9;
+  border-color: #096dd9;
+}
+
+.ant-tabs {
+  margin-bottom: 20px;
+}
+
+.ant-tabs-tab {
+  font-weight: bold;
+}
+
+.ant-tabs-content {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.ant-table {
+  margin-top: 20px;
+}
+
+.ant-table-thead > tr > th {
+  background-color: #f0f0f0;
+  font-weight: bold;
+}
+
+.ant-table-tbody > tr > td {
+  padding: 12px;
+}
+
+.ant-table .ant-btn {
+  border-radius: 4px;
+}
+
+.ant-checkbox {
+  margin-top: 10px;
+}
+
+.ant-divider {
+  margin: 20px 0;
+  border-color: #e0e0e0;
+}
+
+.ant-form-item .ant-form-item-control-input {
+  background-color: #fff;
+}
+
+.ant-form-item .ant-form-item-control-input input[type="file"] {
+  padding: 0;
+  border: none;
+}
+
+.ant-form-item .ant-form-item-control-input textarea {
+  border-radius: 4px;
+  border: 1px solid #d9d9d9;
+}
+
+@media (max-width: 1200px) {
+  .Ledform-container {
+    padding: 15px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 992px) {
+  .Ledform-container {
+    padding: 10px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 12px;
+  }
+
+  .ant-form-item-label {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .Ledform-container {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ant-form {
+    padding: 15px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 10px;
+  }
+
+  .ant-form-item-label {
+    font-size: 14px;
+  }
+
+  .ant-tabs-content {
+    padding: 15px;
+  }
+
+  .ant-table {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .Ledform-container {
+    padding: 8px;
+  }
+
+  .ant-form {
+    padding: 10px;
+  }
+
+  .ant-form-item {
+    margin-bottom: 8px;
+  }
+
+  .ant-form-item-label {
+    font-size: 12px;
+  }
 }

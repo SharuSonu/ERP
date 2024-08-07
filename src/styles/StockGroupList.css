@@ -19,10 +19,11 @@
 }
 
 /* Search Bar */
-.input-group {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+.StockGroup-list .ant-input-search {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 20px; /* Center the search input and add margin */
+  display: block; /* Ensure the search bar is a block element for centering */
 }
 
 .input-group input[type="text"] {

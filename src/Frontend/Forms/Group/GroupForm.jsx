@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Form, Input, Button, Select, Divider } from 'antd';
 import { createGroup, fetchGroups } from '../../utils/RestApi'; // Assuming correct import path
 import { AppContext } from '../../../Context/AppContext';
+import '../../../styles/GroupForm.css';
 
 const { Option } = Select;
 
@@ -96,7 +97,7 @@ const GroupForm = () => {
 
   return (
     <div className="group-form">
-      <h4>Group Creation</h4>
+      <h4>𝑮𝒓𝒐𝒖𝒑 𝑪𝒓𝒆𝒂𝒕𝒊𝒐𝒏</h4>
       <Divider />
 
       <Form

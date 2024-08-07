@@ -3,6 +3,7 @@ import { Form, Input, Button, Select, Divider } from 'antd';
 import { createStockGroup, fetchStockGroups } from '../../utils/RestApi'; // Assuming correct import path
 import { AppContext } from '../../../Context/AppContext';
 //import { AppContext } from '../../../Context/AppContext';
+import '../../../styles/StockGroupform.css';
 
 const { Option } = Select;
 
@@ -70,7 +71,7 @@ const StockGroupForm = () => {
 
   return (
     <div className="stock-group-form">
-      <h4>Stock Group Creation</h4>
+      <h4>𝑺𝒕𝒐𝒄𝒌 𝑮𝒓𝒐𝒖𝒑 𝑪𝒓𝒆𝒂𝒕𝒊𝒐𝒏</h4>
       <Divider />
 
       <Form
