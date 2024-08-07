@@ -1,230 +1,189 @@
-/* LedgerList.module.css */
+/* GroupList.css - Modern and Clean */
 
-/* Search bar */
-.input-group {
-    margin-bottom: 20px;
-  }
-  
-  .input-group input[type="text"] {
-      padding: 8px 10px;
-      border-radius: 8px;
-      outline: none;
-  }
-  
-  .input-group-append button {
-    border-radius: 25px;
-  }
-  
-  /* Table */
-  .table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .table th,
-  .table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .table th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .table tbody tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  /* Action buttons */
-  .btn-group .btn {
-    border-radius: 25px;
-    padding: 8px 16px;
-  }
-  
-  .btn-info {
-    background-color: #17a2b8;
-    color: #fff;
-  }
-  
-  .btn-success {
-    background-color: #28a745;
-    color: #fff;
-  }
-  
-  .btn-warning {
-    background-color: #ffc107;
-    color: #212529;
-  }
-  
-  .btn-group .btn:not(:last-child) {
-    margin-right: 10px;
-  }
-  
-  /* Pagination */
-  .pagination {
-    justify-content: flex-end;
-    margin-top: 20px;
-  }
-  
-  .page-link {
-    color: #007bff;
-    border: 1px solid #007bff;
-    background-color: #fff;
-    padding: 6px 12px;
-    border-radius: 25px;
-  }
-  
-  .page-link:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .page-item.active .page-link {
-    background-color: #007bff;
-    border-color: #007bff;
-    color: #fff;
-  }
-  
-  .page-item.disabled .page-link {
-    pointer-events: none;
-    background-color: #f8f9fa;
-    border-color: #dee2e6;
-    color: #6c757d;
-  }
-  
-  .print-button {
-    background-color: #ff8018; /* Blue color for Print button */
-    color: #fff;
-    border: none;
-  }
-  
-  .export-button {
-    background-color: #1ac4ad; /* Green color for Export button */
-    color: #fff;
-    border: none;
-  }
-  
-  .edit-button {
-    background-color: #1890ff; /* Red color for Edit button */
-    color: #fff;.unit-list {
-      padding: 20px;
-      background-color: #faf4f4;
-      text-align: center; /* Center all text content */
-    }
-    
-    .unit-list h2 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-    
-    .unit-list h3 {
-      font-size: 18px;
-      margin-bottom: 15px;
-    }
-    
-    .unit-list .ant-input-search {
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto 20px; /* Center the search input */
-    }
-    
-    .unit-list .ant-table {
-      margin: 0 auto 20px; /* Center the table */
-      border-collapse: collapse; /* Collapse borders for a cleaner look */
-      width: 100%; /* Ensure table takes full width */
-    }
-    
-    /* Table header */
-    .unit-list .ant-table-thead > tr > th {
-      background: #f0f0f0; /* Light grey background for headers */
-      color: #333; /* Dark text color for contrast */
-      font-weight: bold; /* Bold text for emphasis */
-      padding: 12px 8px; /* Padding for better spacing */
-      text-align: left; /* Align text to the left */
-      border-bottom: 2px solid #e0e0e0; /* Bottom border for separation */
-    }
-    
-    /* Table body */
-    .unit-list .ant-table-tbody > tr > td {
-      padding: 12px 8px; /* Padding for cells */
-      border-bottom: 1px solid #e0e0e0; /* Bottom border for separation */
-      color: #333; /* Text color for cells */
-    }
-    
-    /* Hover effect for table rows */
-    .unit-list .ant-table-tbody > tr:hover {
-      background: #fafafa; /* Slightly darker background on hover */
-    }
-    
-    /* Buttons in the table */
-    .unit-list .ant-btn {
-      margin-right: 10px;
-    }
-    
-    /* Edit button styling */
-    .unit-list .edit-button {
-      color: #f2f6fb; /* Light color for edit button */
-      background-color: #1890ff; /* Primary color background */
-      border: none; /* Remove default border */
-      padding: 6px 12px; /* Padding for better button size */
-    }
-    
-    /* Delete button styling */
-    .unit-list .delete-button {
-      color: #ec1115; /* Red color for delete button */
-      background-color: #fff; /* White background */
-      border: 1px solid #ec1115; /* Red border */
-      padding: 6px 12px; /* Padding for better button size */
-    }
-    
-    /* Pagination styling */
-    .unit-list .ant-pagination {
-      margin-top: 20px;
-      text-align: center; /* Center pagination controls */
-    }
-    
-    /* Modal title */
-    .unit-list .ant-modal-title {
-      font-size: 18px; /* Font size for modal title */
-    }
-    
-    /* Modal footer */
-    .unit-list .ant-modal-footer {
-      display: flex;
-      justify-content: center; /* Center footer content */
-    }
-    
-    /* Form item labels */
-    .unit-list .ant-form-item-label > label {
-      font-weight: 600; /* Bold labels */
-    }
-    
-    /* Form items */
-    .unit-list .ant-form-item {
-      margin-bottom: 15px; /* Space between form items */
-    }
-    
-    /* Checkbox group */
-    .unit-list .ant-checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center; /* Center the checkbox group */
-    }
-    
-    .unit-list .ant-checkbox-group > .ant-checkbox-wrapper {
-      flex: 1 1 120px; /* Flex basis for checkbox wrappers */
-    }
-    
-    border: none;
-  }
-  
-  /* Ensure button spacing */
-  .btn-group .ant-btn {
-    margin-right: 8px;
-  }
-  
+/* General layout */
+.group-list {
+  padding: 20px;
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.group-list h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+/* Center the search bar */
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.mb-3 {
+  margin-bottom: 20px !important;
+}
+
+.ant-input-search {
+  width: 60%;
+}
+
+.ant-input-search input {
+  padding: 8px 10px;
+  border-radius: 12px;
+  outline: none;
+  border: 1px solid #ddd;
+  transition: border-color 0.3s;
+}
+
+.ant-input-search input:focus {
+  border-color: #007bff;
+}
+
+/* Checkbox group */
+.ant-row {
+  margin-bottom: 20px;
+}
+
+.ant-checkbox-group-item {
+  margin-right: 16px;
+}
+
+/* Table */
+.ant-table {
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ant-table th {
+  background-color: #fafafa;
+  font-weight: bold;
+  color: #333;
+}
+
+.ant-table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.ant-table tbody tr:hover {
+  background-color: #f0f0f0;
+}
+
+.ant-table td, .ant-table th {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Buttons */
+.btn-group .ant-btn {
+  margin-right: 8px;
+  border-radius: 25px;
+  padding: 8px 16px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.btn-group .ant-btn:hover {
+  transform: scale(1.05);
+}
+
+.edit-button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+}
+
+.edit-button:hover {
+  background-color: #0056b3;
+}
+
+.delete-button {
+  background-color: #f8f4f4;
+  color: #f80505;
+  border: none;
+}
+
+.delete-button:hover {
+  background-color: #ff4d4f;
+  color: #f8f3f3;
+}
+
+/* Pagination */
+.ant-pagination {
+  margin-top: 20px;
+  text-align: right;
+}
+
+.ant-pagination-item-active {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
+}
+
+.ant-pagination-item-link {
+  color: #007bff;
+  border: 1px solid #007bff;
+  background-color: #fff;
+  border-radius: 25px;
+}
+
+.ant-pagination-item-link:hover {
+  background-color: #f0f0f0;
+}
+
+/* Modals */
+.ant-modal {
+  border-radius: 12px;
+}
+
+.ant-modal-header {
+  background-color: #fafafa;
+  border-bottom: 1px solid #ddd;
+}
+
+.ant-modal-title {
+  font-size: 18px;
+  color: #333;
+}
+
+.ant-modal-footer .ant-btn {
+  border-radius: 25px;
+}
+
+.ant-modal-footer .ant-btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.ant-modal-footer .ant-btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Form */
+.ant-form-item {
+  margin-bottom: 16px;
+}
+
+.ant-form-item-label {
+  font-weight: bold;
+}
+
+.ant-input, .ant-select-selector {
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  transition: border-color 0.3s;
+}
+
+.ant-input:focus, .ant-select-selector:focus {
+  border-color: #007bff;
+}
+
+.ant-select-dropdown {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
