@@ -11,6 +11,7 @@ import Header from '../../components/Header';
 import { createSalesman, fetchSalesman } from '../../utils/RestApi';
 import { useNavigate } from 'react-router-dom';
 import SalesmanList from './SalesManlist';
+import '../../../styles/Salesman.css';
 
 
 const SalesManForm = () => {
@@ -92,13 +93,13 @@ const SalesManForm = () => {
     return (
       
       <div>
-        <h2 style={{ textAlign: 'center',color:'Blue' }}>Sales Person Profile</h2>
+        <h2 style={{ textAlign: 'center' }}>𝑺𝒂𝒍𝒆𝒔 𝑷𝒆𝒓𝒔𝒐𝒏 𝑷𝒓𝒐𝒇𝒊𝒍𝒆</h2>
         <Button type="primary" onClick={showModal}>
-          Add Salesman 
+          Sales Person Creation 
         </Button>
         <Modal
         
-          title={<div style={{ textAlign: 'center', fontWeight: 'bold', color: 'lightBlue' }}>Enter SalesMan Details</div>}
+          title={<div style={{ textAlign: 'center' }}>𝑬𝒏𝒕𝒆𝒓 𝑺𝒂𝒍𝒆𝒔 𝑷𝒆𝒓𝒔𝒐𝒏 𝑫𝒆𝒕𝒂𝒊𝒍𝒔</div>}
           visible={isModalVisible}
           onCancel={handleCancel}
           footer={null} // No footer or customize with actions if needed

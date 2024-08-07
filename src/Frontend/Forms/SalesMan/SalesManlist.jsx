@@ -320,7 +320,7 @@ useEffect(() => {
 
   return (
     <div className="SalesMan-list">
-      <h2>SalesMan List</h2>
+      <h2>𝑺𝒂𝒍𝒆𝒔 𝑷𝒆𝒓𝒔𝒐𝒏 𝑳𝒊𝒔𝒕</h2>
 
       <Input.Search
         className="mb-3"
