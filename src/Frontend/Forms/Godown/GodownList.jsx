@@ -319,7 +319,7 @@ useEffect(() => {
 
   return (
     <div className="Godown-list">
-      <h2>Godown List</h2>
+      <h2>𝑮𝒐𝒅𝒐𝒘𝒏 𝑳𝒊𝒔𝒕</h2>
 
       <Input.Search
         className="mb-3"

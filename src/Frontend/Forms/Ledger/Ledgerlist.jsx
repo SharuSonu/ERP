@@ -256,7 +256,7 @@ const LedgerList = ({ onSelectLedger }) => {
 
   return (
     <div className="ledger-list">
-      <h2>Customer List</h2>
+      <h2>𝑪𝒖𝒔𝒕𝒐𝒎𝒆𝒓 𝑳𝒊𝒔𝒕</h2>
 
       <Input.Search
         className="mb-3"

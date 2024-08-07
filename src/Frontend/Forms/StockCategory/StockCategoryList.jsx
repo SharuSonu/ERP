@@ -331,7 +331,7 @@ useEffect(() => {
 
   return (
     <div className="StockGroup-list">
-      <h2>Stock Category List</h2>
+      <h2>𝑺𝒕𝒐𝒄𝒌 𝑪𝒂𝒕𝒆𝒈𝒐𝒓𝒚 𝑳𝒊𝒔𝒕</h2>
 
       <Input.Search
         className="mb-3"

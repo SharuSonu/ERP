@@ -329,7 +329,7 @@ const StockGroupList = ({ onSelectStockGroup }) => {
 
   return (
     <div className="StockGroup-list">
-      <h2>StockGroup List</h2>
+      <h2>𝑺𝒕𝒐𝒄𝒌 𝑮𝒓𝒐𝒖𝒑 𝑳𝒊𝒔𝒕</h2>
 
       <Input.Search
         className="mb-3"

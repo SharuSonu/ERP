@@ -344,7 +344,7 @@ useEffect(() => {
 
   return (
     <div className="group-list">
-      <h2>Group List</h2>
+      <h2>𝑮𝒓𝒐𝒖𝒑 𝑳𝒊𝒔𝒕</h2>
 
       <Input.Search
         className="mb-3"
