@@ -18,6 +18,8 @@ const salesmanroutes = require('./SalesMan/SalesMan');
 const Godown=require('./Godown/Godown');
 const Stockcategory= require('./Stock Category/Stockcategory');
 const Dashboard = require('./Dashboard/Dashboard');
+const Unitsroutes = require('./Units/Units');
+const Compoundroutes=require('./Units/Compoundunits');
 
 
 const app = express();
@@ -113,6 +115,9 @@ app.use('/api', salesmanroutes);
 app.use('/api', Godown);
 
 app.use('/api',Stockcategory);
+
+app.use('/api',Unitsroutes);
+app.use('/api',Compoundroutes);
 
 //prashanth code
 
@@ -259,6 +264,297 @@ app.get('/api/Godown_delete/:deleteGodownId', async (req, res) => {
         res.status(500).json({ error: 'Error fetching data' });
     }
 });
+
+
+
+app.get('/api/Units', async (req, res) => {
+    const { databaseName } = req.query; // Extract databaseName from query params
+
+    const dbNamePrefix = "erp_";
+    const dbName = dbNamePrefix + databaseName.toLowerCase().replace(/\s+/g, '_');
+    //console.log("database : "+dbName);
+    if (!dbName || !dbName.startsWith('erp_')) {
+        return res.status(400).json({ success: false, message: 'Valid database name starting with "erp_" is required' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.changeUser({ database: dbName }); // Switch to the specified database
+        const [rows] = await connection.query('SELECT * FROM Simple_details');
+        await connection.release();
+
+        const groups = rows.map(row => row.name);
+        res.json({ success: true, groups });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch groups', error });
+    }
+});
+
+
+app.get('/api/Compoundunits', async (req, res) => {
+    const { databaseName } = req.query; // Extract databaseName from query params
+
+    const dbNamePrefix = "erp_";
+    const dbName = dbNamePrefix + databaseName.toLowerCase().replace(/\s+/g, '_');
+    //console.log("database : "+dbName);
+    if (!dbName || !dbName.startsWith('erp_')) {
+        return res.status(400).json({ success: false, message: 'Valid database name starting with "erp_" is required' });
+    }
+
+    try {
+        const connection = await pool.getConnection();
+        await connection.changeUser({ database: dbName }); // Switch to the specified database
+        const [rows] = await connection.query('SELECT * FROM Compoundunits_details');
+        await connection.release();
+
+        const groups = rows.map(row => row.name);
+        res.json({ success: true, groups });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch groups', error });
+    }
+});
+
+app.get('/api/UnitsList', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        const sql = 'SELECT * FROM Simple_details';
+
+        // Execute query
+        const [results] = await connection.query(sql);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
+app.get('/api/CompoundsList', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        const sql = 'SELECT * FROM Compoundunits_details';
+
+        // Execute query
+        const [results] = await connection.query(sql);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
+
+app.get('/api/Units_edit/:editUnitId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { editUnitId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        const sql = 'SELECT * FROM Simple_details WHERE id = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [editUnitId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Simple Units  not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
+app.get('/api/compUnits_edit/:editcompUnitId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { editcompUnitId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        const sql = 'SELECT * FROM Compoundunits_details WHERE id = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [editcompUnitId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Simple Units  not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
+app.get('/api/Units_delete/:deleteUnitId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { deleteUnitId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        const sql = 'SELECT * FROM Simple_details WHERE id = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [deleteUnitId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Simple Units  not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
+app.get('/api/compUnits_delete/:deletecompUnitId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { deletecompUnitId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        const sql = 'SELECT * FROM Compoundunits_details WHERE id = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [deletecompUnitId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Simple Units  not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
 
 
 

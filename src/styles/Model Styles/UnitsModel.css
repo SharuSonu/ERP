@@ -1,0 +1,104 @@
+/* Modal container */
+.custom-modal .ant-modal {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal title container */
+.custom-modal .ant-modal-header {
+    background: #f5f5f5;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 16px;
+    text-align: center; /* Center the title container */
+}
+
+/* Modal title text */
+.custom-modal .ant-modal-title {
+    font-size: 20px; /* Increased font size for better visibility */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #333; /* Dark text color for contrast */
+    margin: 0; /* Remove default margin */
+}
+
+/* Modal body */
+.custom-modal .ant-modal-body {
+    padding: 24px;
+    line-height: 1.5; /* Improved line height for readability */
+    font-size: 16px; /* Slightly larger font size for better readability */
+    background-color: #ffffff; /* White background for the form area */
+    display: flex;
+    flex-direction: column; /* Stack items vertically */
+    gap: 16px; /* Space between form items */
+}
+
+/* Form item labels */
+.custom-modal .ant-form-item {
+    margin-bottom: 16px; /* Space between form items */
+    font-weight: bold; /* Bold text for emphasis */
+}
+
+/* Form item labels */
+.custom-modal .ant-form-item-label > label {
+    color: #333;
+    font-weight: 600; /* Slightly more pronounced bold */
+    font-weight: bold; /* Bold text for emphasis */
+    margin-bottom: 8px; /* Space between label and input */
+    display: block; /* Ensure labels are displayed as block elements */
+}
+
+/* Form item inputs */
+.custom-modal .ant-input {
+    border-radius: 5px;
+    border: 1px solid #d9d9d9;
+    padding: 8px 12px; /* Increase padding for better input area */
+    font-size: 14px; /* Set a readable font size */
+    background-color: #fafafa; /* Light grey background for inputs */
+    width: 100%; /* Ensure inputs fill the available width */
+}
+
+/* Form item input focus */
+.custom-modal .ant-input:focus {
+    border-color: #1890ff; /* Blue border on focus */
+    box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2); /* Blue shadow on focus */
+}
+
+/* Modal footer */
+.custom-modal .ant-modal-footer {
+    background: #f5f5f5;
+    border-top: 1px solid #e8e8e8;
+    padding: 16px;
+    text-align: right;
+    display: flex; /* Use flexbox for button alignment */
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 8px; /* Space between buttons */
+}
+
+/* Primary button in footer */
+.custom-modal .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+    color: #fff; /* Ensure text is white on the primary button */
+    font-weight: 600; /* Bold text for better readability */
+    padding: 8px 16px; /* More padding for better button size */
+}
+
+/* Cancel button in footer */
+.custom-modal .ant-btn-default {
+    color: #1890ff;
+    border-color: #1890ff;
+    font-weight: 600; /* Bold text for better readability */
+    padding: 8px 16px; /* More padding for better button size */
+}
+
+/* Hover and focus states for buttons */
+.custom-modal .ant-btn-primary:hover,
+.custom-modal .ant-btn-primary:focus {
+    background-color: #40a9ff; /* Lighter blue for hover/focus */
+    border-color: #40a9ff;
+}
+
+.custom-modal .ant-btn-default:hover,
+.custom-modal .ant-btn-default:focus {
+    color: #40a9ff; /* Lighter blue for hover/focus */
+    border-color: #40a9ff;
+}

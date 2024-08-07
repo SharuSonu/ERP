@@ -306,6 +306,113 @@ export const DeleteSalesman = async (companyName) => {
   }
 };
 
+// Prashanth code for units
+export const createunits = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/create-units`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+export const UpdateUnits = async (companyName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/update-Units`, {
+      params: { companyName: companyName } // Pass companyName as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+export const DeleteUnits = async (companyName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Delete-Units`, {
+      params: { companyName: companyName } // Pass companyName as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+export const fetchUnits = async (companyName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Units`, {
+      params: { databaseName: companyName }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+export const createCompoundUnits = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/create-compoundunits`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+}
+
+export const UpdatecompUnits = async (companyName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/update-compUnits`, {
+      params: { companyName: companyName } // Pass companyName as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+
+export const DeletecompUnits = async (companyName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Delete-compUnits`, {
+      params: { companyName: companyName } // Pass companyName as a query parameter
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+
+export const fetchCompUnits = async (companyName) => {
+  try {
+    const response = await axios.get(`${BASE_URL}/Compoundunits`, {
+      params: { databaseName: companyName }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+
+
 export const createGodown = async (data) => {
   try {
     const response = await axios.post(`${BASE_URL}/create-Godown`, data, {
