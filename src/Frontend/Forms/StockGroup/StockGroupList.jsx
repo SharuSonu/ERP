@@ -4,7 +4,8 @@ import PropTypes from 'prop-types';
 import { AppContext } from '../../../Context/AppContext';
 import { createGroup, fetchStockGroups } from '../../utils/RestApi';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
-import '../../../styles/StockGroupList.css';
+//import '../../../styles/StockGroupList.css';
+import '../../../styles/Godown.css';
 
 //import dotenv from 'dotenv';
 //dotenv.config();

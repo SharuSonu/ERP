@@ -1,0 +1,91 @@
+/* GroupList.css */
+
+/* Overall container styling */
+.Godown-list {
+    padding: 20px;
+    background-color: #f4f9f9; /* Light background for the container */
+  }
+  
+  /* Title styling */
+  .Godown-list h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-align: center; /* Center align the title */
+    color: #333; /* Dark color for the title */
+  }
+  
+  /* Search bar styling */
+  .Godown-list .ant-input-search {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto 20px; /* Center the search input and add margin */
+    display: block; /* Ensure the search bar is a block element for centering */
+  }
+  
+  /* Table container styling */
+  .Godown-list .ant-table {
+    margin: 0 auto 20px; /* Center the table */
+    border-collapse: collapse; /* Collapse borders for a cleaner look */
+    width: 100%; /* Ensure table takes full width */
+  }
+  
+  /* Pagination styling */
+  .Godown-list .ant-pagination {
+    margin-top: 20px;
+    text-align: right; /* Align pagination controls to the right */
+  }
+  
+  /* Modal title */
+  .Godown-list .ant-modal-title {
+    font-size: 18px; /* Font size for modal title */
+  }
+  
+  /* Modal footer */
+  .Godown-list .ant-modal-footer {
+    display: flex;
+    justify-content: center; /* Center footer content */
+  }
+  
+  /* Form item labels */
+  .Godown-list .ant-form-item-label > label {
+    font-weight: 600; /* Bold labels */
+  }
+  
+  /* Form items */
+  .Godown-list .ant-form-item {
+    margin-bottom: 15px; /* Space between form items */
+  }
+  
+  /* Checkbox group */
+  .Godown-list .ant-checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center; /* Center the checkbox group */
+  }
+  
+  .Godown-list .ant-checkbox-group > .ant-checkbox-wrapper {
+    flex: 1 1 120px; /* Flex basis for checkbox wrappers */
+  }
+  
+  /* Button styling */
+  .Godown-list .ant-btn {
+    margin-right: 10px;
+  }
+  
+  /* Edit button styling */
+  .Godown-list .edit-button {
+    color: #ffffff; /* Light color for edit button */
+    background-color: #40a9ff; /* Primary color background */
+    border: none; /* Remove default border */
+    padding: 6px 12px; /* Padding for better button size */
+  }
+  
+  /* Delete button styling */
+  .Godown-list .delete-button {
+    color: #ff4d4f; /* Red color for delete button */
+    background-color: #ffffff; /* White background */
+    border: 1px solid #ff4d4f; /* Red border */
+    padding: 6px 12px; /* Padding for better button size */
+  }
+  

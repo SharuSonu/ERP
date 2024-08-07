@@ -5,7 +5,7 @@ import { createGroup, fetchGodown } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
 
-import '../../../styles/GroupList.css';
+import '../../../styles/Godown.css';
 import { Message } from 'semantic-ui-react';
 
 const { Option } = Select;
