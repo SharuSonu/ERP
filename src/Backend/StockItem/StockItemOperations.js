@@ -28,8 +28,8 @@ const getDatabaseName = (organizationName) => {
 // Function to create a stock item
 async function createStockItem(reqBody) {
     const { 
-        name, alias, Group, partNo, under, units, alternateUnits, 
-        gstApplicable, gstDetails, openingBalance, openingBalanceRate, openingBalanceValue, 
+        name, group_alias,category,category_alias, parentGroup, partNo,  units, alternateUnits, Conversion_units,Conversion,Denominator_units,Denominator,
+        gstApplicable, gstDetails, openingBalance,  
         openingBalanceBreakupData, databaseName 
     } = reqBody;
 
@@ -42,27 +42,30 @@ async function createStockItem(reqBody) {
         connection = await mysql.createConnection({ ...dbConfig, database: dbName });
 
         // Create the stockitem table if it does not exist
-        await connection.query(`
-            CREATE TABLE IF NOT EXISTS stockitem (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                name VARCHAR(255) NOT NULL,
-                group_alias VARCHAR(255),
-                partNo VARCHAR(255),
-                parentGroup VARCHAR(255),
-                units VARCHAR(50),
-                alternateUnits VARCHAR(50),
-                gstApplicable BOOLEAN,
-                openingBalance DECIMAL(15, 2),
-                openingBalanceRate DECIMAL(15, 2),
-                openingBalanceValue DECIMAL(15, 2)
-            )
-        `);
+        await connection.query(`CREATE TABLE IF NOT EXISTS stockitem (
+            id int NOT NULL AUTO_INCREMENT,
+            name varchar(255) NOT NULL,
+            group_alias varchar(255) DEFAULT NULL,
+            category varchar(255) DEFAULT NULL,
+            category_alias varchar(255) DEFAULT NULL,
+            partNo varchar(255) DEFAULT NULL,
+            parentGroup varchar(255) DEFAULT NULL,
+            units varchar(50) DEFAULT NULL,
+            alternateUnits varchar(50) DEFAULT NULL,
+            Conversion_units varchar(50) DEFAULT NULL,
+            Conversion float DEFAULT NULL,
+            Denominator_units varchar(50) DEFAULT NULL,
+            Denominator float DEFAULT NULL, 
+            gstApplicable tinyint(1) DEFAULT NULL,
+            openingBalance Varchar (255) DEFAULT NULL,
+            PRIMARY KEY (id)
+          )`);
 
         // Insert stock item data
         const [insertResult] = await connection.query(`
-            INSERT INTO stockitem (name, group_alias, partNo, parentGroup, units, alternateUnits, gstApplicable, openingBalance, openingBalanceRate, openingBalanceValue)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [name, alias || '', partNo, Group || 'Primary', under, units, alternateUnits, gstApplicable === 'yes', openingBalance || 0, openingBalanceRate || 0, openingBalanceValue || 0]);
+            INSERT INTO stockitem (name, group_alias,category,category_alias, parentGroup, partNo,  units, alternateUnits, Conversion_units,Conversion,Denominator_units,Denominator, gstApplicable, openingBalance)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)
+        `, [name, group_alias,category,category_alias, parentGroup, partNo,  units, alternateUnits, Conversion_units,Conversion,Denominator_units,Denominator, gstApplicable === 'yes', openingBalance || 0]);
 
         const stockItemId = insertResult.insertId;
 
@@ -94,20 +97,20 @@ async function createStockItem(reqBody) {
                 CREATE TABLE IF NOT EXISTS sku_opening_balance(
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     stockItemId INT,
-                    godown VARCHAR(255),
-                    batch VARCHAR(255),
-                    ratePer DECIMAL(15, 2),
+                    Quantity float DEFAULT NULL, 
+                    Rate  DECIMAL(15, 2),
+                    Per VARCHAR(255),
                     amount DECIMAL(15, 2),
                     FOREIGN KEY (stockItemId) REFERENCES stockitem(id) ON DELETE CASCADE
                 )
             `);
 
             for (const breakup of openingBalanceBreakupData) {
-                const { godown, batch, ratePer, amount } = breakup;
+                const { Quantity, Rate, Per, amount } = breakup;
                 await connection.query(`
-                    INSERT INTO sku_opening_balance(stockItemId, godown, batch, ratePer, amount)
+                    INSERT INTO sku_opening_balance(stockItemId, Quantity, Rate, Per, amount)
                     VALUES (?, ?, ?, ?, ?)
-                `, [stockItemId, godown, batch, ratePer, amount]);
+                `, [stockItemId,Quantity, Rate, Per, amount]);
             }
         }
 

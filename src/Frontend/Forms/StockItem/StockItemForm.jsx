@@ -4,6 +4,7 @@ import { MinusCircleOutlined, PlusOutlined, CloseOutlined } from '@ant-design/ic
 import { createStockItem, fetchStockGroups } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import moment from 'moment';
+import '../../../styles/StockItem.css';
 const { Option } = Select;
 
 const StockItemForm = () => {
@@ -54,45 +55,45 @@ const StockItemForm = () => {
   }, []);//[companyName, defaultGroups]
   const columns = [
     {
-      title: 'Godown',
-      dataIndex: 'godown',
-      key: 'godown',
+      title: 'Quantity',
+      dataIndex: 'Quantity',
+      key: 'Quantity',
       render: (_, record, index) => (
         <Input style={{ width: 120 }}
-          placeholder="Godown"
-          onChange={(e) => handleOpeningBalanceBreakupChange(index, 'godown', e.target.value)}
+          placeholder="Quantity"
+          onChange={(e) => handleOpeningBalanceBreakupChange(index, 'Quantity', e.target.value)}
         />
       ),
     },
     {
-      title: 'Batch',
-      dataIndex: 'batch',
-      key: 'batch',
+      title: 'Rate',
+      dataIndex: 'Rate',
+      key: 'Rate',
       render: (_, record, index) => (
         <Input style={{ width: 150 }}
-          placeholder="Batch"
-          onChange={(e) => handleOpeningBalanceBreakupChange(index, 'batch', e.target.value)}
+          placeholder="Rate"
+          onChange={(e) => handleOpeningBalanceBreakupChange(index, 'Rate', e.target.value)}
         />
       ),
     },
     {
-      title: 'Rate Per',
-      dataIndex: 'ratePer',
-      key: 'ratePer',
+      title: 'Per',
+      dataIndex: 'Per',
+      key: 'Per',
       render: (_, record, index) => (
         <Input style={{ width: 120 }}
-          placeholder="Rate Per"
-          onChange={(e) => handleOpeningBalanceBreakupChange(index, 'ratePer', e.target.value)}
+          placeholder=" Per"
+          onChange={(e) => handleOpeningBalanceBreakupChange(index, 'Per', e.target.value)}
         />
       ),
     },
     {
-      title: 'Amount',
+      title: 'Value',
       dataIndex: 'amount',
       key: 'amount',
       render: (_, record, index) => (
         <Input style={{ width: 200 }}
-          placeholder="Amount"
+          placeholder="Value"
           onChange={(e) => handleOpeningBalanceBreakupChange(index, 'amount', e.target.value)}
         />
       ),
@@ -108,8 +109,8 @@ const StockItemForm = () => {
     },
   ];
 
-  const handleOpeningBalanceBalanceChange = (e) => {
-    const hasOpeningBalance = e.target.value.trim() !== '';
+  const handleOpeningBalanceChange = (value) => {
+    const hasOpeningBalance = value === 'yes';
     setShowOpeningBalanceBreakup(hasOpeningBalance);
   };
 
@@ -170,6 +171,8 @@ const StockItemForm = () => {
     setIsGSTApplicable(value === 'yes');
   };
 
+  const inputStyle = { width: '100%' }; // Style for uniform width
+
   return (
     <div className="SKUForm-container">
       <h4>Stock Item Creation</h4>
@@ -178,87 +181,106 @@ const StockItemForm = () => {
         name="stock_item_creation"
         initialValues={{ remember: true }}
         onFinish={onFinish}
-        layout="vertical"
-        style={{ width: '600px' }}
+        layout="horizontal"
+        style={{ width: '100%' }}
       >
-        <Form.Item
-          label="Name"
-          name="name"
-          rules={[{ required: true, message: 'Please input the name!' }]}
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Part No"
-          name="partNo"
-          
-        >
-          <Input />
-        </Form.Item>
-
-        {/* Other form items... */}
-        <Form.Item
-          label="Alias"
-          name="alias"
-          
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="group"
-          name="under"
-        >
-          <Select showSearch optionFilterProp="children">
-            {StockGroupOptions.length > 0 ? (
-              StockGroupOptions.map((group) => (
-                <Option key={group} value={group}>
-                  {group}
-                </Option>
-              ))
-            ) : (
-              <Option value="" disabled>
-                No data
-              </Option>
-            )}
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          label="Units"
-          name="units"
-          
-        >
-          <Select placeholder="Select units">
-            <Option value="nos">Nos</Option>
-            <Option value="kg">Kg</Option>
-            <Option value="ltr">Ltr</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item
-          label="Alternate units"
-          name="alternateUnits"
-          
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="GST Applicable"
-          name="gstApplicable"
-          rules={[{ required: true, message: 'Please select if GST is applicable!' }]}
-        >
-          <Select placeholder="Select GST applicability" onChange={handleGSTApplicableChange}>
-            <Option value="yes">Yes</Option>
-            <Option value="no">No</Option>
-          </Select>
-        </Form.Item>
-
+        <Row gutter={16}>
+          <Col span={13}>
+            <Form.Item
+              label="Name"
+              name="name"
+              rules={[{ required: true, message: 'Please input the name!' }]}
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+          </Col>
+  
+          <Col span={9}>
+            <Form.Item
+              label="Part No"
+              name="partNo"
+            >
+              <Input style={inputStyle} className='part-no-right' />
+            </Form.Item>
+          </Col>
+        </Row>
+  
+        <Row gutter={16}>
+          <Col span={13}>
+            <Form.Item
+              label="Alias"
+              name="alias"
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+          </Col>
+        </Row>
+  
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              label="Group"
+              name="under"
+            >
+              <Select style={inputStyle} showSearch optionFilterProp="children">
+                {StockGroupOptions.length > 0 ? (
+                  StockGroupOptions.map((group) => (
+                    <Option key={group} value={group}>
+                      {group}
+                    </Option>
+                  ))
+                ) : (
+                  <Option value="" disabled>No data</Option>
+                )}
+              </Select>
+            </Form.Item>
+          </Col>
+  
+          <Col span={8}>
+            <Form.Item
+              label="Units"
+              name="units"
+            >
+              <Select style={inputStyle} placeholder="Select units">
+                <Option value="nos">Nos</Option>
+                <Option value="kg">Kg</Option>
+                <Option value="ltr">Ltr</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+  
+          <Col span={8}>
+            <Form.Item
+              label="Alternate Units"
+              name="alternateUnits"
+            >
+              <Select style={inputStyle} placeholder="Select units">
+                <Option value="nos">Nos</Option>
+                <Option value="kg">Kg</Option>
+                <Option value="ltr">Ltr</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+  
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              label="GST Applicable"
+              name="gstApplicable"
+              rules={[{ required: true, message: 'Please select if GST is applicable!' }]}
+            >
+              <Select style={inputStyle} placeholder="Select GST applicability" onChange={handleGSTApplicableChange}>
+                <Option value="yes">Yes</Option>
+                <Option value="no">No</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+  
         {isGSTApplicable && (
           <>
-            <h4>GST DETAILS</h4>
+            <h4>GST Details</h4>
             <Divider />
             <Form.List name="gstDetails">
               {(fields, { add, remove }) => (
@@ -266,68 +288,63 @@ const StockItemForm = () => {
                   {fields.map((field) => (
                     <div key={field.key} className="gst-detail-group">
                       <Row gutter={16}>
-                        <Col span={12}>
+                        <Col span={8}>
                           <Form.Item
                             {...field}
                             label="Applicable Date"
                             name={[field.name, 'applicableDate']}
                             fieldKey={[field.fieldKey, 'applicableDate']}
-                            
                           >
-                            <DatePicker style={{ width: '100%' }} />
+                            <DatePicker style={inputStyle} />
                           </Form.Item>
                         </Col>
-                      </Row>
-                      <Row gutter={16}>
-                        <Col span={12}>
+  
+                        <Col span={8}>
                           <Form.Item
                             {...field}
-                            label="HSN SAC DETAILS"
+                            label="HSN SAC Details"
                             name={[field.name, 'hsnSacDetails']}
                             fieldKey={[field.fieldKey, 'hsnSacDetails']}
-                            
                           >
-                            <Input />
+                            <Input style={inputStyle} />
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+  
+                        <Col span={8}>
                           <Form.Item
                             {...field}
                             label="HSN"
                             name={[field.name, 'hsn']}
                             fieldKey={[field.fieldKey, 'hsn']}
-                            
                           >
-                            <Input />
+                            <Input style={inputStyle} />
                           </Form.Item>
                         </Col>
                       </Row>
                       <Row gutter={16}>
-                        <Col span={12}>
+                        <Col span={8}>
                           <Form.Item
                             {...field}
                             label="Taxability"
                             name={[field.name, 'taxability']}
                             fieldKey={[field.fieldKey, 'taxability']}
-                            
                           >
-                            <Input />
+                            <Input style={inputStyle} />
                           </Form.Item>
                         </Col>
-                        <Col span={12}>
+  
+                        <Col span={8}>
                           <Form.Item
                             {...field}
                             label="GST Rate"
                             name={[field.name, 'gstRate']}
                             fieldKey={[field.fieldKey, 'gstRate']}
-                           
                           >
-                            <Input />
+                            <Input style={inputStyle} />
                           </Form.Item>
                         </Col>
-                      </Row>
-                      <Row gutter={16}>
-                        <Col span={12}>
+  
+                        <Col span={8}>
                           <MinusCircleOutlined onClick={() => remove(field.name)} className="remove-button" />
                         </Col>
                       </Row>
@@ -343,20 +360,22 @@ const StockItemForm = () => {
             </Form.List>
           </>
         )}
-
-
-        <h4>Opening Balance</h4>
-        <Divider />
-
-        <Form.Item
-          label="Opening Balance"
-          name="openingBalance"
-          style={{ width: 200 }}
-        >
-          <Input onChange={handleOpeningBalanceBalanceChange} />
-        </Form.Item>
-
-        {/* Conditionally render Opening Balance breakup section */}
+  
+        <Row gutter={16}>
+          <Col span={8}>
+            <Form.Item
+              label="Enable Opening Balance"
+              name="openingBalance"
+              rules={[{ required: true, message: 'Please select if Opening Balance is applicable!' }]}
+            >
+              <Select style={inputStyle} placeholder="Select Opening Balance applicability" onChange={handleOpeningBalanceChange}>
+                <Option value="yes">Yes</Option>
+                <Option value="no">No</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        </Row>
+  
         {showOpeningBalanceBreakup && (
           <div>
             <Divider>Opening Balance Breakup</Divider>
@@ -366,24 +385,10 @@ const StockItemForm = () => {
               pagination={false}
               rowKey={(record, index) => index}
             />
-            <Button onClick={addOpeningBalanceRow}>Add Row</Button>
+            {/*<Button onClick={addOpeningBalanceRow} type="dashed">Add Row</Button>*/}
           </div>
         )}
-
-        <Form.Item
-          label="Rate"
-          name="openingBalanceRate"
-        >
-          <Input />
-        </Form.Item>
-
-        <Form.Item
-          label="Value"
-          name="openingBalanceValue"
-        >
-          <Input />
-        </Form.Item>
-
+  
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Submit
@@ -392,6 +397,6 @@ const StockItemForm = () => {
       </Form>
     </div>
   );
-};
+}  
 
 export default StockItemForm;

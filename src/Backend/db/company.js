@@ -383,12 +383,11 @@ router.post('/create-db', async (req, res) => {
               await connection.query(`CREATE TABLE sku_opening_balance (
                 id int NOT NULL AUTO_INCREMENT,
                 stockItemId int DEFAULT NULL,
-                quantity float DEFAULT NULL, 
-                godown varchar(255) DEFAULT NULL,
-                batch varchar(255) DEFAULT NULL,
-                ratePer float DEFAULT NULL,
-                amount float DEFAULT NULL,
-                PRIMARY KEY (id),
+               Quantity float DEFAULT NULL, 
+               Rate  DECIMAL(15, 2),
+               Per VARCHAR(255),
+               amount DECIMAL(15, 2),
+               PRIMARY KEY (id),
                 KEY (stockItemId)
               )`);
              
@@ -418,9 +417,7 @@ router.post('/create-db', async (req, res) => {
                 Denominator_units varchar(50) DEFAULT NULL,
                 Denominator float DEFAULT NULL, 
                 gstApplicable tinyint(1) DEFAULT NULL,
-                openingBalance float DEFAULT NULL,
-                openingBalanceRate float DEFAULT NULL,
-                openingBalanceValue float DEFAULT NULL,
+                openingBalance varchar(255) DEFAULT NULL,
                 PRIMARY KEY (id)
               )`);
 

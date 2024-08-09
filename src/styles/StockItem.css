@@ -1,0 +1,127 @@
+  
+/* StockItemForm.css */
+
+/* Additional Styles for Right Alignment */
+.part-no-right {
+    text-align: right;
+  }
+  
+/* Container Styles */
+.SKUForm-container {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  /* Header Styles */
+  .SKUForm-container h4 {
+    font-size: 1.5em;
+    color: #333;
+    margin-bottom: 20px;
+    text-align: center; /* Center the title */
+  }
+  
+  /* Divider Styles */
+  .ant-divider {
+    margin: 20px 0;
+    border-color: #e8e8e8;
+  }
+  
+  /* Form Item Styles */
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  /* Label Styles */
+  .ant-form-item-label > label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  /* Input and Select Styles */
+  .ant-input, .ant-select {
+    border-radius: 4px;
+    border: 1px solid #dcdcdc;
+  }
+  
+  .ant-input:focus, .ant-select:not(.ant-select-customize-input):focus {
+    border-color: #40a9ff;
+    box-shadow: 0 0 0 2px rgba(64, 169, 255, 0.2);
+  }
+  
+  .ant-select .ant-select-selector {
+    border-radius: 4px;
+  }
+  
+  .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+  }
+  
+  .ant-btn-primary:hover {
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+  }
+  
+  /* Table Styles */
+  .ant-table {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .ant-table-thead > tr > th {
+    background-color: #f0f0f0;
+    color: #555;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 12px;
+  }
+  
+  .ant-table-tbody > tr:hover > td {
+    background-color: #fafafa;
+  }
+  
+  .ant-table-tbody .ant-input {
+    border: none;
+    box-shadow: none;
+  }
+  
+  /* Button Styles */
+  .ant-btn {
+    border-radius: 4px;
+  }
+  
+  .ant-btn-dashed {
+    border-style: dashed;
+  }
+  
+  .ant-btn-dashed:hover {
+    border-color: #40a9ff;
+    color: #40a9ff;
+  }
+  
+  /* Icon Styles */
+  .remove-button {
+    cursor: pointer;
+  }
+  
+  .remove-button:hover {
+    color: #ff4d4f;
+  }
+  
+  /* Responsive Styles */
+  @media (max-width: 768px) {
+    .ant-col {
+      padding: 0 8px;
+    }
+  
+    .SKUForm-container {
+      padding: 10px;
+    }
+  }
+  
