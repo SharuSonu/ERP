@@ -503,9 +503,7 @@ router.post('/itemimport', upload.single('file'), async (req, res) => {
         Denominator: row['Denominator'],
         Denominator_units: row['Denominator_units'],
         gstApplicable: row['gstApplicable'] === 'Yes' ? 1 : 0,
-        openingBalance: row['openingBalance'],
-        openingBalanceRate: row['openingBalanceRate'],
-        openingBalanceValue: row['openingBalanceValue']
+        openingBalance: row['openingBalance']
       }));
 
       function parseDate(dateInput) {
@@ -550,10 +548,9 @@ router.post('/itemimport', upload.single('file'), async (req, res) => {
       const importOPData = data.map(row => ({
         name: row['name'], 
         partNo: row['partNo'],
-        godown: row['godown'],
-        batch : row['batch'],
-        quantity: row['quantity'],
-        ratePer: row['ratePer'],
+        Rate : row['Rate'],
+        Quantity: row['Quantity'],
+        Per: row['Per'],
         amount: row['amount']
 
       }));
@@ -574,9 +571,7 @@ router.post('/itemimport', upload.single('file'), async (req, res) => {
                 Denominator,
                 Denominator_units,
                 gstApplicable,
-                openingBalance,
-                openingBalanceRate,
-                openingBalanceValue
+                openingBalance     
             ) VALUES ?
             ON DUPLICATE KEY UPDATE
                 group_alias = VALUES(group_alias),
@@ -590,9 +585,8 @@ router.post('/itemimport', upload.single('file'), async (req, res) => {
                 Denominator = VALUES(Denominator),
                 Denominator_units = VALUES(Denominator_units),
                 gstApplicable = VALUES(gstApplicable),
-                openingBalance = VALUES(openingBalance),
-                openingBalanceRate = VALUES(openingBalanceRate),
-                openingBalanceValue = VALUES(openingBalanceValue)
+                openingBalance = VALUES(openingBalance)
+                
         `;
       const values = importData.map(item => Object.values(item));
   
@@ -684,25 +678,22 @@ router.post('/itemimport', upload.single('file'), async (req, res) => {
     const OPDetailsQuery = `
         INSERT IGNORE INTO sku_opening_balance (
             stockItemId,
-            godown,
-            quantity,
-            batch,
-            ratePer,
+            Quantity,
+            Rate,
+            Per,
             amount
         ) VALUES ?
          ON DUPLICATE KEY UPDATE
-    godown = VALUES(godown),
-    quantity = VALUES(quantity),
-    batch = VALUES(batch),
-    ratePer = VALUES(ratePer),
+    Quantity = VALUES(Quantity),
+    Rate = VALUES(Rate),
+    Per = VALUES(Per),
     amount = VALUES(amount);
     `;
     const OPDetailsValues = importOPData.map(item => [
         idMapOP.get(`${item.name}-${item.partNo}`), // Use the mapping to get the stockItemId
-        item.godown,
-        item.quantity,
-        item.batch,
-        item.ratePer,
+        item.Quantity,
+        item.Rate,
+        item.Per,
         item.amount
     ]);
 

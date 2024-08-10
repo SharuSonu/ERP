@@ -175,7 +175,7 @@ const StockItemForm = () => {
 
   return (
     <div className="SKUForm-container">
-      <h4>Stock Item Creation</h4>
+      <h4>𝑺𝒕𝒐𝒄𝒌 𝑰𝒕𝒆𝒎 𝑪𝒓𝒆𝒂𝒕𝒊𝒐𝒏</h4>
       <Divider />
       <Form
         name="stock_item_creation"
@@ -187,7 +187,7 @@ const StockItemForm = () => {
         <Row gutter={16}>
           <Col span={13}>
             <Form.Item
-              label="Name"
+              label="StockItem_Name"
               name="name"
               rules={[{ required: true, message: 'Please input the name!' }]}
             >
@@ -208,8 +208,30 @@ const StockItemForm = () => {
         <Row gutter={16}>
           <Col span={13}>
             <Form.Item
-              label="Alias"
+              label="StockItem_Alias"
               name="alias"
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={13}>
+            <Form.Item
+              label="Category_Name"
+              name="category"
+            >
+              <Input style={inputStyle} />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <Row gutter={16}>
+          <Col span={13}>
+            <Form.Item
+              label="Category_Alias"
+              name="category_alias"
             >
               <Input style={inputStyle} />
             </Form.Item>
@@ -280,7 +302,7 @@ const StockItemForm = () => {
   
         {isGSTApplicable && (
           <>
-            <h4>GST Details</h4>
+            <h4>𝐆𝐒𝐓 𝐃𝐞𝐭𝐚𝐢𝐥𝐬</h4>
             <Divider />
             <Form.List name="gstDetails">
               {(fields, { add, remove }) => (
@@ -378,7 +400,7 @@ const StockItemForm = () => {
   
         {showOpeningBalanceBreakup && (
           <div>
-            <Divider>Opening Balance Breakup</Divider>
+            <Divider>𝐎𝐩𝐞𝐧𝐢𝐧𝐠 𝐁𝐚𝐥𝐚𝐧𝐜𝐞 𝐁𝐫𝐞𝐚𝐤𝐮𝐩</Divider>
             <Table
               dataSource={openingBalanceBreakupData}
               columns={columns}
