@@ -1,23 +1,49 @@
+/* Base Button Styling */
+.btn-group .ant-btn {
+  padding: 8px 16px; /* Adjust padding for better button size */
+  border-radius: 4px; /* Rounded corners */
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transitions */
+  cursor: pointer; /* Pointer cursor on hover */
+}
+
+/* Print Button */
 .print-button {
-    background-color: #ff8018; /* Blue color for Print button */
-    color: #fff;
-    border: none;
-  }
-  
-  .export-button {
-    background-color: #1ac4ad; /* Green color for Export button */
-    color: #fff;
-    border: none;
-  }
-  
-  .edit-button {
-    background-color: #1890ff; /* Red color for Edit button */
-    color: #fff;
-    border: none;
-  }
-  
-  /* Ensure button spacing */
-  .btn-group .ant-btn {
-    margin-right: 8px;
-  }
-  
+  background-color: #ff8018; /* Orange color for Print button */
+}
+
+.print-button:hover {
+  background-color: #e66a1a; /* Darker orange on hover */
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+/* Export Button */
+.export-button {
+  background-color: #1ac4ad; /* Teal color for Export button */
+}
+
+.export-button:hover {
+  background-color: #19a99b; /* Darker teal on hover */
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+/* Edit Button */
+.edit-button {
+  background-color: #1890ff; /* Blue color for Edit button */
+}
+
+.edit-button:hover {
+  background-color: #007bff; /* Darker blue on hover */
+  transform: translateY(-2px); /* Slight lift effect on hover */
+}
+
+/* Ensure button spacing */
+.btn-group .ant-btn {
+  margin-right: 8px;
+}
+
+.btn-group .ant-btn:last-child {
+  margin-right: 0; /* Remove right margin for the last button */
+}
