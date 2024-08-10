@@ -3,7 +3,8 @@ import Select from 'react-select';
 import { Formik, Form, Field, FieldArray } from 'formik';
 import { Button, Divider,message } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import '../../../styles/Invoice/InvoiceForm.css';
+//import '../../../styles/Invoice/InvoiceForm.css';
+import '../../../styles/Vouchercreation.css';
 import { createSalesVoucher } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import axios from 'axios';
@@ -522,14 +523,14 @@ useEffect(() => {
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-      {({ values, setFieldValue, resetForm }) => {
+      {({ values, setFieldValue }) => {
         useEffect(() => {
           const fetchVoucherNumberOnMount = async () => {
             const newVoucherNumber = await fetchVoucherNumber();
-            if(newVoucherNumber!='NaN')
-             setFieldValue('voucherNumber', newVoucherNumber);
+            if (newVoucherNumber !== 'NaN')
+              setFieldValue('voucherNumber', newVoucherNumber);
             else
-             setFieldValue('voucherNumber', 1);
+              setFieldValue('voucherNumber', 1);
           };
           fetchVoucherNumberOnMount();
         }, [companyName, setFieldValue]);
@@ -545,23 +546,26 @@ useEffect(() => {
                 <label>Voucher Type Name:</label>
                 <Field name="voucherTypeName" type="text" readOnly className="field-input" />
               </div>
+              
               <div className="form-row">
                 <label>Voucher Date:</label>
-                <Field name="voucherDate" type="date" className="field-input"
-                
-                onChange={async (e) => {
-                  const newVoucherDate = e.target.value;
-                  setFieldValue('voucherDate', newVoucherDate);
-                  
-                  // Update rate for all inventory items based on new date
-                  for (let i = 0; i < values.inventory.length; i++) {
-                    const itemName = values.inventory[i].itemName;
-                    if (itemName) {
-                      console.log(itemName)
-                      //await handleItemChange({label: itemName }, i, setFieldValue, values);
+                <Field
+                  name="voucherDate"
+                  type="date"
+                  className="field-input"
+                  onChange={async (e) => {
+                    const newVoucherDate = e.target.value;
+                    setFieldValue('voucherDate', newVoucherDate);
+                    
+                    // Update rate for all inventory items based on new date
+                    for (let i = 0; i < values.inventory.length; i++) {
+                      const itemName = values.inventory[i].itemName;
+                      if (itemName) {
+                        console.log(itemName);
+                        // await handleItemChange({ label: itemName }, i, setFieldValue, values);
+                      }
                     }
-                  }
-                }}
+                  }}
                 />
               </div>
               <div className="form-row">
@@ -579,6 +583,8 @@ useEffect(() => {
                   className="field-input"
                   isLoading={loading}
                 />
+              </div>
+              <div className="form-row">
                 <label>Salesman Name:</label>
                 <Select
                   options={Salesmanoptions}
@@ -588,8 +594,6 @@ useEffect(() => {
                 />
               </div>
             </div>
-
-
 
             <div className="form-sections">
               <div className="form-row">
@@ -613,7 +617,6 @@ useEffect(() => {
                     <tbody>
                       {values.inventory.map((item, index) => (
                         <tr key={index}>
-
                           <td>
                             <Select
                               options={inventoryOptions}
@@ -622,10 +625,7 @@ useEffect(() => {
                               isLoading={loadingProducts}
                               value={item.itemName}
                             />
-                            <Field
-                              name={`inventory.${index}.productId`}
-                              type="hidden"
-                            />
+                            <Field name={`inventory.${index}.productId`} type="hidden" />
                           </td>
                           <td>
                             <Field
@@ -666,7 +666,6 @@ useEffect(() => {
                               type="number"
                               readOnly
                               className="field-input"
-                              
                             />
                           </td>
                           <td>
@@ -700,76 +699,74 @@ useEffect(() => {
             </div>
 
             <div className="ledger-entry-section">
-          <div className="legend">
-              <h5>Ledger Entries</h5>
-            </div>
-            <FieldArray name="ledgerEntries">
-              {({ insert, remove, push }) => (
-                <div>
-                  <table className="ledgerentries-table">
-                    <thead>
-                      <tr>
-                        <th style={{ width: '40%' }}>Particulars</th>
-                        <th style={{ width: '20%' }}>Rate%</th>
-                        <th style={{ width: '30%' }}>Amount</th>
-                        <th style={{ width: '5%' }}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {values.ledgerEntries.map((entry, index) => (
-                        <tr key={index}>
-                          <td>
-                            <Select
-                              name={`ledgerEntries.${index}.particulars`}
-                              placeholder="Particulars"
-                              options={ledgerOptions}
-                              onChange={(option) => handleLedgerChange(option, index, setFieldValue, values)}
-                              value={values.ledgerEntries[index].particulars}
-                              className="table-input field-input"
-                            />
-                          </td>
-                          <td>
-                          <Field
-                              name={`ledgerEntries.${index}.rate`}
-                              placeholder="Rate"
-                              type="number"
-                              className="table-input field-input"
-                              onChange={(e) => handleledFieldChange(e, index, 'rate', setFieldValue, values)}
-                            />
-                          </td>
-                          <td>
-                          <Field
-                              name={`ledgerEntries.${index}.amount`}
-                              placeholder="Amount"
-                              type="number"
-                              value={values.ledgerEntries[index].amount}
-                              className="table-input field-input"
-                              
-                            />
-                          </td>
-                          <td>
-                          <Button
-                              type="danger"
-                              icon={<DeleteOutlined />}
-                              onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
-                            />
+              <div className="legend">
+                <h5>Ledger Entries</h5>
+              </div>
+              <FieldArray name="ledgerEntries">
+                {({ insert, remove, push }) => (
+                  <div>
+                    <table className="ledgerentries-table">
+                      <thead>
+                        <tr>
+                          <th style={{ width: '40%' }}>Particulars</th>
+                          <th style={{ width: '20%' }}>Rate%</th>
+                          <th style={{ width: '30%' }}>Amount</th>
+                          <th style={{ width: '5%' }}>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {values.ledgerEntries.map((entry, index) => (
+                          <tr key={index}>
+                            <td>
+                              <Select
+                                name={`ledgerEntries.${index}.particulars`}
+                                placeholder="Particulars"
+                                options={ledgerOptions}
+                                onChange={(option) => handleLedgerChange(option, index, setFieldValue, values)}
+                                value={values.ledgerEntries[index].particulars}
+                                className="table-input field-input"
+                              />
+                            </td>
+                            <td>
+                              <Field
+                                name={`ledgerEntries.${index}.rate`}
+                                placeholder="Rate"
+                                type="number"
+                                className="table-input field-input"
+                                onChange={(e) => handleledFieldChange(e, index, 'rate', setFieldValue, values)}
+                              />
+                            </td>
+                            <td>
+                              <Field
+                                name={`ledgerEntries.${index}.amount`}
+                                placeholder="Amount"
+                                type="number"
+                                value={values.ledgerEntries[index].amount}
+                                className="table-input field-input"
+                              />
+                            </td>
+                            <td>
+                              <Button
+                                type="danger"
+                                icon={<DeleteOutlined />}
+                                onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                        <tr>
+                          <td colSpan="4">
+                            <Button type="dashed" onClick={() => push({ particulars: '', rate: 0, amount: 0 })}>
+                              Add Entry
+                            </Button>
                           </td>
                         </tr>
-                      ))}
-                      <tr>
-                        <td colSpan="4">
-                          <Button type="dashed" onClick={() => push({ particulars: '', rate: 0, amount: 0 })}>
-                            Add Entry
-                          </Button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  
-                </div>
-              )}
-            </FieldArray>
-          </div>
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </FieldArray>
+            </div>
 
             <div className="form-section">
               <div className="form-row">
@@ -786,9 +783,8 @@ useEffect(() => {
               <Button type="primary" htmlType="submit">
                 Submit
               </Button>
-              
             </div>
-            <Divider></Divider>
+            <Divider />
           </Form>
         );
       }}

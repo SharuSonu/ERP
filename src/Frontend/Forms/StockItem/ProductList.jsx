@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import { AppContext } from '../../../Context/AppContext';
-import { Input, Table, Button, message, Pagination, Divider, Spin } from 'antd'; // Import Ant Design components
+import { Input, Table, Button, message, Pagination, Divider, Spin } from 'antd';
 import '../../../styles/ProductList.css';
 import { BASE_URL } from '../../utils/Ipurl';
 
@@ -63,22 +63,28 @@ const ProductList = ({ onSelectProduct }) => {
   // Columns configuration for Ant Design Table
   const columns = [
     { title: 'ID', dataIndex: 'id', key: 'id' },
-    { title: 'Product', dataIndex: 'name', key: 'name' },
-    { title: 'Code', dataIndex: 'partNo', key: 'partNo' },
+    { title: 'Name', dataIndex: 'name', key: 'name' },
+    { title: 'Part No', dataIndex: 'partNo', key: 'partNo' },
     { title: 'Category', dataIndex: 'category', key: 'category' },
-    { title: 'Price', dataIndex: 'price', key: 'price' },
     { title: 'Brand Name', dataIndex: 'parentGroup', key: 'parentGroup' },
     { title: 'Cost', dataIndex: 'cost', key: 'cost' },
     { title: 'Quantity', dataIndex: 'quantity', key: 'quantity' },
-    {
-      title: 'Action',
+    { title: 'Units', dataIndex: 'units', key: 'units' },
+    { title: 'Alternate Units', dataIndex: 'alternateUnits', key: 'alternateUnits' },
+    { title: 'GST Applicable', dataIndex: 'gstApplicable', key: 'gstApplicable' },
+    { title: 'HSN SAC Details', dataIndex: 'hsnSacDetails', key: 'hsnSacDetails' },
+    { title: 'HSN', dataIndex: 'hsn', key: 'hsn' },
+    { title: 'Taxability', dataIndex: 'taxability', key: 'taxability' },
+    { title: 'GST Rate', dataIndex: 'gstRate', key: 'gstRate' },
+    { title: 'Applicable Date', dataIndex: 'applicableDate', key: 'applicableDate' },
+    { title: 'Action',
       key: 'action',
       render: (_, record) => (
         <div className="btn-group" role="group" aria-label="Actions">
           <Button
             type="default"
             className="edit-button"
-            onClick={() => openEditModal(record.id)}
+            onClick={() => onSelectProduct(record.id)}
           >
             Edit
           </Button>
@@ -93,12 +99,6 @@ const ProductList = ({ onSelectProduct }) => {
       ),
     },
   ];
-
-  // Function to open edit modal for a product
-  const openEditModal = (productId) => {
-    // Implement your logic to open edit modal
-    console.log(`Open edit modal for product with ID: ${productId}`);
-  };
 
   if (loading) return <Spin size="large" />;
   if (error) return <p>Error: {error.message}</p>;
@@ -136,9 +136,8 @@ const ProductList = ({ onSelectProduct }) => {
         showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
         style={{ marginTop: 20, textAlign: 'right' }}
       />
-      <Divider></Divider>
+      <Divider />
     </div>
-
   );
 };
 
