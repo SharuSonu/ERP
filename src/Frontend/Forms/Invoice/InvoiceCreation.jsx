@@ -769,9 +769,30 @@ useEffect(() => {
             </div>
 
             <div className="form-section">
+      <div className="form-row">
+        <label htmlFor="paymentType">Payment Type:</label>
+        <Field name="paymentType">
+          {({ field, form }) => (
+            <Select
+              id="paymentType"
+              {...field}
+              onChange={(value) => form.setFieldValue('paymentType', value)}
+              className="field-input"
+            >
+              <Option value="cash">Cash</Option>
+              <Option value="imps">IMPS</Option>
+              <Option value="card">Card</Option>
+              <Option value="upi">UPI</Option>
+            </Select>
+          )}
+        </Field>
+        </div>
+
+              <div className="form-section">
               <div className="form-row">
                 <label>Narration:</label>
                 <Field name="narration" as="textarea" className="field-input" />
+              </div>
               </div>
               <div className="form-row">
                 <label>Total Amount:</label>
