@@ -6,9 +6,11 @@ import {fetchCompUnits} from  '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
 //import { Table, Form, Button, Modal, Switch } from 'antd';
-import '../../../styles/Unitslist.css';
+//import '../../../styles/Unitslist.css';
 //import '../../../styles/GroupList.css';
 import '../../../styles/Model Styles/UnitsModel.css';
+import '../../../styles/Formliststyle/Commonform.css';
+import '../../../styles/Formliststyle/Tableform.css';
 
 
 const { Option } = Select;
@@ -27,19 +29,19 @@ const UnitsList = ({ onSelectUnit }) => {
   const [pageSize, setPageSize] = useState(5);
   const [unitOptions, setUnitOptions] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({
-    id: true,
-    Symbolname:true,
-    Formalname:true,
-    QUCname:true,
-    Decimalnum:true,
-    action: true,
+    𝙸𝙳: true,
+    𝚂𝚢𝚖𝚋𝚘𝚕𝙽𝚊𝚖𝚎:true,
+    𝙵𝚘𝚛𝚖𝚊𝚕𝙽𝚊𝚖𝚎:true,
+    𝚀𝚄𝙲𝚗𝚊𝚖𝚎:true,
+    𝙳𝚎𝚌𝚒𝚖𝚊𝚕𝙽𝚘:true,
+    𝙰𝚌𝚝𝚒𝚘𝚗: true,
   });
 const [columnVisibilitys, setColumnVisibilitys] = useState({
-    id: true,
-    Firstunit:true,
-    NumValue:true,
-    Secondunit:true,
-    action: true,
+   𝙸𝙳: true,
+   𝙵𝚒𝚛𝚜𝚝𝚞𝚗𝚒𝚝:true,
+   𝚅𝚊𝚕𝚞𝚎:true,
+   𝚂𝚎𝚌𝚘𝚗𝚍𝚞𝚗𝚒𝚝:true,
+    𝙰𝚌𝚝𝚒𝚘𝚗: true,
 });
 
 const [editUnitId, setEditUnitId] = useState(null);
@@ -313,17 +315,17 @@ useEffect(() => {
 
 
   const Simplecolumns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', visible: columnVisibility.id },
-    { title: 'Symbol Name', dataIndex: 'Symbolname', key: 'Symbolname', visible: columnVisibility.Symbolname },
-    { title: 'Formal Name', dataIndex: 'Formalname', key: 'Formalname', visible: columnVisibility.Formalname },
-    { title: 'QUC Name', dataIndex: 'QUCname', key: 'QUCname', visible: columnVisibility.QUCname },
-    { title: 'Decimal Number', dataIndex: 'Decimalnum', key: 'Decimalnum', visible: columnVisibility.Decimalnum },
+    { title: '𝐈𝐃', dataIndex: 'id', key: 'id', visible: columnVisibility.𝙸𝙳 },
+    { title: '𝐒𝐲𝐦𝐛𝐨𝐥 𝐍𝐚𝐦𝐞', dataIndex: 'Symbolname', key: 'Symbolname', visible: columnVisibility.𝚂𝚢𝚖𝚋𝚘𝚕𝙽𝚊𝚖𝚎 },
+    { title: '𝐅𝐨𝐫𝐦𝐚𝐥 𝐍𝐚𝐦𝐞', dataIndex: 'Formalname', key: 'Formalname', visible: columnVisibility.𝙵𝚘𝚛𝚖𝚊𝚕𝙽𝚊𝚖𝚎 },
+    { title: '𝐐𝐔𝐂 𝐍𝐚𝐦𝐞', dataIndex: 'QUCname', key: 'QUCname', visible: columnVisibility.𝚀𝚄𝙲𝚗𝚊𝚖𝚎 },
+    { title: '𝐃𝐞𝐜𝐢𝐦𝐚𝐥 𝐍𝐮𝐦𝐛𝐞𝐫', dataIndex: 'Decimalnum', key: 'Decimalnum', visible: columnVisibility.𝙳𝚎𝚌𝚒𝚖𝚊𝚕𝙽𝚘 },
     {
-      title: 'Action',
+      title: '𝐀𝐜𝐭𝐢𝐨𝐧',
       key: 'action',
-      visible: columnVisibility.action,
+      visible: columnVisibility.𝙰𝚌𝚝𝚒𝚘𝚗,
       render: (_, record) => (
-        <div className="btn-unit" role="unit" aria-label="Actions">
+        <div className="btn-group" role="unit" aria-label="Actions">
           <Button
             type="default"
             className="edit-button"
@@ -344,16 +346,16 @@ useEffect(() => {
   ].filter(column => column.visible);
 
   const Compoundcolumns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', visible: columnVisibilitys.id },
-    { title: 'First Unit', dataIndex: 'Firstunit', key: 'Firstunit', visible: columnVisibilitys.Firstunit },
-    { title: 'Value', dataIndex: 'NumValue', key: 'NumValue', visible: columnVisibilitys.NumValue },
-    { title: 'Second Unit', dataIndex: 'Secondunit', key: 'Secondunit', visible: columnVisibilitys.Secondunit },
+    { title: '𝐈𝐃', dataIndex: 'id', key: 'id', visible: columnVisibilitys.𝙸𝙳 },
+    { title: '𝐅𝐢𝐫𝐬𝐭 𝐔𝐧𝐢𝐭', dataIndex: 'Firstunit', key: 'Firstunit', visible: columnVisibilitys.𝙵𝚒𝚛𝚜𝚝𝚞𝚗𝚒𝚝 },
+    { title: '𝐕𝐚𝐥𝐮𝐞', dataIndex: 'NumValue', key: 'NumValue', visible: columnVisibilitys.𝚅𝚊𝚕𝚞𝚎 },
+    { title: '𝐒𝐞𝐜𝐨𝐧𝐝 𝐔𝐧𝐢𝐭', dataIndex: 'Secondunit', key: 'Secondunit', visible: columnVisibilitys.𝚂𝚎𝚌𝚘𝚗𝚍𝚞𝚗𝚒𝚝 },
     {
-      title: 'Action',
+      title: '𝐀𝐜𝐭𝐢𝐨𝐧',
       key: 'action',
-      visible: columnVisibilitys.action,
+      visible: columnVisibilitys.𝙰𝚌𝚝𝚒𝚘𝚗,
       render: (_, record) => (
-        <div className="btn-unit" role="unit" aria-label="Actions">
+        <div className="btn-group" role="unit" aria-label="Actions">
           <Button
             type="default"
             className="edit-button"
@@ -637,11 +639,12 @@ const closecompdeleteModal = () => {
 
 
   return (
-    <div className="unit-list">
+    <div className="container">
       <h2>𝑳𝒊𝒔𝒕 𝑶𝒇 𝑼𝒏𝒊𝒕𝒔</h2>
 
-  
-      <Row gutter={[16, 16]}>
+      <Divider />
+      
+      <Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibility).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -655,16 +658,21 @@ const closecompdeleteModal = () => {
         ))}
       </Row>
   
+      
       <Divider />
+
   
       {/* Simple Units Table */}
+      <div className="search-bar-container">
       <Input.Search
         className="mb-3"
         placeholder="Search Simple Units Info..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+      </div>
       <h3>𝑺𝒊𝒎𝒑𝒍𝒆 𝑼𝒏𝒊𝒕𝒔</h3>
+      <div className="table-container">
       <Table
         dataSource={paginatedSimpleUnits.filter(unit =>
           (unit.Symbolname?.toLowerCase() ?? '').includes(searchTerm.toLowerCase()) ||
@@ -675,6 +683,7 @@ const closecompdeleteModal = () => {
         columns={Simplecolumns}
         pagination={false}
       />
+      </div>
 
 <Pagination
         current={currentPageSimple}
@@ -691,7 +700,8 @@ const closecompdeleteModal = () => {
       <Divider />
 
       
-      <Row gutter={[16, 16]}>
+     
+      <Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibilitys).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -708,14 +718,16 @@ const closecompdeleteModal = () => {
       <Divider />
   
       {/* Compound Units Table */}
+      <div className="search-bar-container">
       <Input.Search
         className="mb-3"
         placeholder="Search Compounds Units Info..."
         value={searchTerms}
         onChange={(e) => setSearchTerms(e.target.value)}
       />
-      
+      </div>
       <h3>𝑪𝒐𝒎𝒑𝒐𝒖𝒏𝒅 𝑼𝒏𝒊𝒕𝒔</h3>
+      <div className="table-container">
       <Table
          dataSource={paginatedCompoundUnits.filter(unit =>
           (unit.Firstunit?.toLowerCase() ?? '').includes(searchTerms.toLowerCase()) ||
@@ -725,7 +737,7 @@ const closecompdeleteModal = () => {
         columns={Compoundcolumns}
         pagination={false}
       />
-  
+  </div>
   <Pagination
         current={currentPageCompound}
         pageSize={pageSize}

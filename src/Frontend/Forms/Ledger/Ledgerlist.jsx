@@ -3,7 +3,10 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
-import '../../../styles/LedgerList.css';
+
+
+import '../../../styles/Formliststyle/Commonform.css';
+import '../../../styles/Formliststyle/Tableform.css';
 
 const LedgerList = ({ onSelectLedger }) => {
   const { companyName } = useContext(AppContext);
@@ -16,15 +19,13 @@ const LedgerList = ({ onSelectLedger }) => {
 
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState({
-    id: true,
-    ledgername: true,
-    GroupName: true,
-    customerEmail: true,
-    customerPhone: true,
-    customerMobile: true,
-    GSTIN: true,
-    pan: false,
-    action: true,
+    𝙸𝙳: true,
+    𝙻𝚎𝚍𝚐𝚎𝚛𝙽𝚊𝚖𝚎: true,
+    𝙶𝚛𝚘𝚞𝚙𝙽𝚊𝚖𝚎: true,
+    𝙴𝚖𝚊𝚒𝚕: true,
+    𝙼𝚘𝚋𝚒𝚕𝚎: true,
+    𝙶𝚂𝚃𝙸𝙽: true,
+    𝙰𝚌𝚝𝚒𝚘𝚗: true,
   });
 
    // State for edit modal
@@ -113,18 +114,16 @@ const LedgerList = ({ onSelectLedger }) => {
   const currentLedgers = filteredLedgers.slice(indexOfFirstLedger, indexOfLastLedger);
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', visible: columnVisibility.id },
-    { title: 'Ledger', dataIndex: 'ledgername', key: 'ledgername', visible: columnVisibility.ledgername },
-    { title: 'Group', dataIndex: 'GroupName', key: 'GroupName', visible: columnVisibility.GroupName },
-    { title: 'Email', dataIndex: 'customerEmail', key: 'customerEmail', visible: columnVisibility.customerEmail },
-    { title: 'Phone', dataIndex: 'customerPhone', key: 'customerPhone', visible: columnVisibility.customerPhone },
-    { title: 'Mobile', dataIndex: 'customerMobile', key: 'customerMobile', visible: columnVisibility.customerMobile },
-    { title: 'GSTIN', dataIndex: 'GSTIN', key: 'GSTIN', visible: columnVisibility.GSTIN },
-    { title: 'PanNo', dataIndex: 'pan', key: 'pan', visible: columnVisibility.pan },
+    { title: '𝐈𝐃', dataIndex: 'id', key: 'id', visible: columnVisibility.𝙸𝙳 },
+    { title: '𝐋𝐞𝐝𝐠𝐞𝐫', dataIndex: 'ledgername', key: 'ledgername', visible: columnVisibility.𝙻𝚎𝚍𝚐𝚎𝚛𝙽𝚊𝚖𝚎 },
+    { title: '𝐆𝐫𝐨𝐮𝐩', dataIndex: 'GroupName', key: 'GroupName', visible: columnVisibility.𝙶𝚛𝚘𝚞𝚙𝙽𝚊𝚖𝚎 },
+    { title: '𝐄𝐦𝐚𝐢𝐥', dataIndex: 'customerEmail', key: 'customerEmail', visible: columnVisibility.𝙴𝚖𝚊𝚒𝚕 },
+    { title: '𝐌𝐨𝐛𝐢𝐥𝐞', dataIndex: 'customerMobile', key: 'customerMobile', visible: columnVisibility.𝙼𝚘𝚋𝚒𝚕𝚎 },
+    { title: '𝐆𝐒𝐓𝐈𝐍', dataIndex: 'GSTIN', key: 'GSTIN', visible: columnVisibility.𝙶𝚂𝚃𝙸𝙽 },
     {
-      title: 'Action',
+      title: '𝐀𝐜𝐭𝐢𝐨𝐧',
       key: 'action',
-      visible: columnVisibility.action,
+      visible: columnVisibility.𝙰𝚌𝚝𝚒𝚘𝚗,
       render: (_, record) => (
         <div className="btn-group" role="group" aria-label="Actions">
           <Button
@@ -255,17 +254,19 @@ const LedgerList = ({ onSelectLedger }) => {
   const pageSizeOptions = ['5', '10', '20', '50'];
 
   return (
-    <div className="ledger-list">
+    <div className="container">
       <h2>𝑪𝒖𝒔𝒕𝒐𝒎𝒆𝒓 𝑳𝒊𝒔𝒕</h2>
 
+ <div className="search-bar-container">
       <Input.Search
-        className="mb-3"
         placeholder="Search ledgername, customerEmail, GroupName, customerMobile, customerPhone..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+      </div>
+      <Divider />
 
-      <Row gutter={[16, 16]}>
+      <Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibility).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -278,14 +279,17 @@ const LedgerList = ({ onSelectLedger }) => {
           </Col>
         ))}
       </Row>
+      
 
       <Divider />
 
+      <div className="table-container">
       <Table
         dataSource={currentLedgers}
         columns={columns}
         pagination={false}
       />
+      </div>
 
       <Pagination
         current={currentPage}

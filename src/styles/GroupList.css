@@ -3,190 +3,136 @@
 /* General layout */
 .group-list {
   padding: 20px;
-  background-color: #f0f0f0;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
+  background-color: #faf4f4; /* Lighter background for a clean look */
+  text-align: center; /* Center all text content */
 }
 
 .group-list h2 {
-  margin-bottom: 20px;
   font-size: 24px;
-  color: #333;
+  margin-bottom: 20px;
+}
+
+.group-list h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
 }
 
 /* Center the search bar */
-.search-bar-container {
+.group-list .search-bar-container {
   display: flex;
   justify-content: center;
   margin-bottom: 20px;
 }
 
-.mb-3 {
-  margin-bottom: 20px !important;
+.group-list .ant-input-search {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto; /* Center the search input */
 }
 
-.ant-input-search {
-  width: 60%;
-}
-
-.ant-input-search input {
-  padding: 8px 10px;
-  border-radius: 12px;
-  outline: none;
-  border: 1px solid #ddd;
-  transition: border-color 0.3s;
-}
-
-.ant-input-search input:focus {
-  border-color: #007bff;
-}
-
-/* Checkbox group */
-.ant-row {
-  margin-bottom: 20px;
-}
-
-.ant-checkbox-group-item {
-  margin-right: 16px;
-}
-
-/* Table */
-.ant-table {
-  background-color: #fff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.ant-table th {
-  background-color: #fafafa;
-  font-weight: bold;
-  color: #333;
-}
-
-.ant-table tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.ant-table tbody tr:hover {
-  background-color: #f0f0f0;
-}
-
-.ant-table td, .ant-table th {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
 
 /* Buttons */
-.btn-group .ant-btn {
-  margin-right: 8px;
+.group-list .btn-group .ant-btn {
+  margin-right: 10px;
   border-radius: 25px;
   padding: 8px 16px;
   transition: background-color 0.3s, transform 0.3s;
 }
 
-.btn-group .ant-btn:hover {
+.group-list .btn-group .ant-btn:hover {
   transform: scale(1.05);
 }
 
-.edit-button {
-  background-color: #007bff;
-  color: #fff;
-  border: 2px solid #007bff; /* Updated border color */
+/* Edit button styling */
+.group-list .edit-button {
+  color: #f2f6fb; /* Light color for edit button */
+  background-color: #1890ff; /* Primary color background */
+  border: none; /* Remove default border */
+  padding: 6px 12px; /* Padding for better button size */
 }
 
-.edit-button:hover {
-  background-color: #0056b3;
-  border: 2px solid #0056b3; /* Updated border color */
-}
-
-.delete-button {
-  background-color: #f8f4f4;
-  color: #f80505;
+/* Delete button styling */
+.group-list .delete-button {
+  color: #ec1115; /* Red color for delete button */
+  background-color: #fff; /* White background */
   border: 1px solid #ec1115; /* Red border */
+  padding: 6px 12px; /* Padding for better button size */
 }
-
-.delete-button:hover {
-  background-color: #ff4d4f;
-  color: #f8f3f3;
-  border: 2px solid #ff4d4f; /* Updated border color */
-}
-
 
 /* Pagination */
-.ant-pagination {
+.group-list .ant-pagination {
   margin-top: 20px;
-  text-align: right;
+  text-align: center; /* Center pagination controls */
 }
 
-.ant-pagination-item-active {
-  background-color: #007bff;
+.group-list .ant-pagination-item-active {
+  background-color: #f1f3f6;
   border-color: #007bff;
   color: #fff;
 }
 
-.ant-pagination-item-link {
+.group-list .ant-pagination-item-link {
   color: #007bff;
   border: 1px solid #007bff;
   background-color: #fff;
   border-radius: 25px;
 }
 
-.ant-pagination-item-link:hover {
+.group-list .ant-pagination-item-link:hover {
   background-color: #f0f0f0;
 }
 
 /* Modals */
-.ant-modal {
+.group-list .ant-modal {
   border-radius: 12px;
 }
 
-.ant-modal-header {
-  background-color: #fafafa;
+.group-list .ant-modal-header {
+  background-color: #f4f4f4;
   border-bottom: 1px solid #ddd;
 }
 
-.ant-modal-title {
+.group-list .ant-modal-title {
   font-size: 18px;
   color: #333;
 }
 
-.ant-modal-footer .ant-btn {
-  border-radius: 25px;
-}
-
-.ant-modal-footer .ant-btn-primary {
-  background-color: #007bff;
-  border-color: #007bff;
-}
-
-.ant-modal-footer .ant-btn-primary:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+.group-list .ant-modal-footer {
+  display: flex;
+  justify-content: center; /* Center footer content */
 }
 
 /* Form */
-.ant-form-item {
-  margin-bottom: 16px;
+.group-list .ant-form-item {
+  margin-bottom: 15px; /* Space between form items */
 }
 
-.ant-form-item-label {
-  font-weight: bold;
+.group-list .ant-form-item-label > label {
+  font-weight: 600; /* Bold labels */
 }
 
-.ant-input, .ant-select-selector {
+.group-list .ant-input, .ant-select-selector {
   border-radius: 12px;
   border: 1px solid #ddd;
   transition: border-color 0.3s;
 }
 
-.ant-input:focus, .ant-select-selector:focus {
+.group-list .ant-input:focus, .ant-select-selector:focus {
   border-color: #007bff;
 }
 
-.ant-select-dropdown {
+.group-list .ant-select-dropdown {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Checkbox group */
+.group-list .ant-checkbox-group {
+  display: flex;
+  align-items: center; /* Align items vertically in the center */
+  gap: 8px; /* Space between checkbox and label */
+}
+
+.group-list .ant-checkbox-group > .ant-checkbox-wrapper {
+  flex: 1 1 120px; /* Flex basis for checkbox wrappers */
 }

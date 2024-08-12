@@ -1,0 +1,72 @@
+/* General Table Styles */
+.table-container {
+  margin: 0 auto; /* Center the table container */
+  width: 100%; /* Ensure container takes full width */
+  max-width: 1200px; /* Limit maximum width for large screens */
+  padding: 20px; /* Add padding around the container */
+}
+
+/* Table Styles */
+.table-container .ant-table {
+  background-color: #ffffff; /* Clean white background */
+  border-radius: 12px; /* Rounded corners for a modern look */
+  overflow: hidden; /* Hide overflow to respect border radius */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  border: 1px solid #e0e0e0; /* Light border for subtle separation */
+}
+
+/* Table Header Styles */
+.table-container .ant-table-thead > tr > th {
+  background: linear-gradient(135deg, #eceaea, #e1e0e0); /* Gradient background */
+  color: #333; /* Dark text color for contrast */
+  font-weight: 600; /* Slightly less bold for a modern look */
+  padding: 16px 12px; /* Increased padding for better spacing */
+  text-align: left; /* Align text to the left */
+  border-bottom: 2px solid #d0d0d0; /* Bottom border for separation */
+  border-right: 1px solid #d0d0d0; /* Right border for column separation */
+  position: relative;
+}
+
+/* Table Body Styles */
+.table-container .ant-table-tbody > tr > td {
+  padding: 16px 12px; /* Increased padding for consistency */
+  border-bottom: 1px solid #d0d0d0; /* Bottom border for separation */
+  color: #333; /* Text color for cells */
+  transition: background-color 0.3s; /* Smooth transition for hover effect */
+  border-right: 1px solid #d0d0d0; /* Right border for column separation */
+}
+
+/* Remove the right border from the last column */
+.table-container .ant-table thead th:last-child,
+.table-container .ant-table tbody td:last-child {
+  border-right: none; /* Remove border from the last column */
+}
+
+/* Alternating Row Colors */
+.table-container .ant-table-tbody > tr:nth-child(even) {
+  background-color: #f9f9f9; /* Light grey background for even rows */
+}
+
+/* Hover Effect for Table Rows */
+.table-container .ant-table-tbody > tr:hover {
+  background: #f0f0f0; /* Slightly darker background on hover */
+}
+
+/* Responsive Design for Tables */
+@media (max-width: 768px) {
+  .table-container .ant-table {
+    font-size: 14px; /* Adjust font size for smaller screens */
+    border-radius: 8px; /* Slightly less rounded corners */
+  }
+
+  .table-container .ant-table th, .table-container .ant-table td {
+    padding: 12px 8px; /* Adjust padding for smaller screens */
+  }
+}
+
+.math-bold-header {
+  font-family: 'Roboto Mono', 'Courier New', Courier,Mathbold; /* Apply monospace font */
+  font-weight: bold; /* Ensure the font is bold */
+  font-size: 16px; /* Adjust the font size as needed */
+  letter-spacing: 0.5px; /* Optional: Adjust letter spacing for a more math-like appearance */
+}

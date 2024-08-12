@@ -1,0 +1,177 @@
+/* General layout */
+.container {
+    padding: 20px;
+    background-color: #faf4f4; /* Lighter background for a clean look */
+    text-align: center; /* Center all text content */
+  }
+  
+  .container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .container h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  
+  /* Center the search bar */
+  .search-bar-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .ant-input-search {
+    width: 70%;
+    max-width: 600px;
+    margin: 0 auto; /* Center the search input */
+  }
+  
+  /* Buttons */
+  .btn-group .ant-btn {
+    margin-right: 10px;
+    border-radius: 25px;
+    padding: 8px 16px;
+    transition: background-color 0.3s, transform 0.3s;
+  }
+  
+  .btn-group .ant-btn:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Edit button styling */
+  .edit-button {
+    color: #f2f6fb; /* Light color for edit button */
+    background-color: #1890ff; /* Primary color background */
+    border: none; /* Remove default border */
+    padding: 6px 12px; /* Padding for better button size */
+  }
+  
+  /* Delete button styling */
+  .delete-button {
+    color: #f5e7e7; /* Red color for delete button */
+    background-color: #d40b0b; /* White background */
+    border: 1px solid #988c8c; /* Red border */
+    padding: 6px 12px; /* Padding for better button size */
+  }
+  
+  /* Pagination */
+  .ant-pagination {
+    margin-top: 20px;
+    text-align: center; /* Center pagination controls */
+  }
+  
+  .ant-pagination-item-active {
+    background-color: #f1f3f6;
+    border-color: #007bff;
+    color: #fff;
+  }
+  
+  .ant-pagination-item-link {
+    color: #007bff;
+    border: 1px solid #007bff;
+    background-color: #fff;
+    border-radius: 25px;
+  }
+  
+  .ant-pagination-item-link:hover {
+    background-color: #f0f0f0;
+  }
+  
+  /* Modals */
+  .ant-modal {
+    border-radius: 12px;
+  }
+  
+  .ant-modal-header {
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .ant-modal-title {
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .ant-modal-footer {
+    display: flex;
+    justify-content: center; /* Center footer content */
+  }
+  
+  /* Form */
+  .ant-form-item {
+    margin-bottom: 15px; /* Space between form items */
+  }
+  
+  .ant-form-item-label > label {
+    font-weight: 600; /* Bold labels */
+  }
+  
+  .ant-input, .ant-select-selector {
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    transition: border-color 0.3s;
+  }
+  
+  .ant-input:focus, .ant-select-selector:focus {
+    border-color: #007bff;
+  }
+  
+  .ant-select-dropdown {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Checkbox group */
+  .ant-checkbox-group {
+    display: flex;
+    align-items: center; /* Align items vertically in the center */
+    gap: 8px; /* Space between checkbox and label */
+  }
+  
+  .ant-checkbox-group > .ant-checkbox-wrapper {
+    flex: 1 1 120px; /* Flex basis for checkbox wrappers */
+  }
+
+  /*------------------------------------------------------------*/
+
+  /* CSS for centering the Row and Col components */
+.centered-row {
+  display: flex;
+  justify-content: center; /* Center items horizontally */
+  align-items: center;     /* Center items vertically */
+  flex-wrap: wrap;         /* Allow items to wrap to the next line */
+}
+
+.centered-col {
+  display: flex;
+  justify-content: center; /* Center content inside each column */
+  align-items: center;     /* Center content inside each column */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

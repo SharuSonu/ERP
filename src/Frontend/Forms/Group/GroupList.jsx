@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import { createGroup, fetchGroups } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
+import '../../../styles/Formliststyle/Commonform.css';
+import '../../../styles/Formliststyle/Tableform.css';
 
-import '../../../styles/GroupList.css';
 import { Message } from 'semantic-ui-react';
 
 const { Option } = Select;
@@ -21,10 +22,10 @@ const GroupList = ({ onSelectGroup }) => {
   const [pageSize, setPageSize] = useState(5);
   const [groupOptions, setGroupOptions] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({
-    id: true,
-    name: true,
-    parentGroup: true,
-    action: true,
+    𝙸𝙳: true,    //Monospace text style format for Fileter titee//
+    𝙶𝚛𝚘𝚞𝚙: true,
+    𝚂𝚞𝚋𝙶𝚛𝚘𝚞𝚙: true,
+    𝙰𝚌𝚝𝚒𝚘𝚗: true,
   });
   const [editGroupId, setEditGroupId] = useState(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -195,13 +196,13 @@ useEffect(() => {
   const currentGroups = filteredGroups.slice(indexOfFirstGroup, indexOfLastGroup);
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', visible: columnVisibility.id },
-    { title: 'Group', dataIndex: 'name', key: 'name', visible: columnVisibility.name },
-    { title: 'SubGroup', dataIndex: 'parentGroup', key: 'parentGroup', visible: columnVisibility.parentGroup },
+    { title: '𝐈𝐃', dataIndex: 'id', key: 'id', visible: columnVisibility.𝙸𝙳 },
+    { title: '𝐆𝐫𝐨𝐮𝐩', dataIndex: 'name', key: 'name', visible: columnVisibility.𝙶𝚛𝚘𝚞𝚙 },
+    { title: '𝐒𝐮𝐛 𝐆𝐫𝐨𝐮𝐩', dataIndex: 'parentGroup', key: 'parentGroup', visible: columnVisibility.𝚂𝚞𝚋𝙶𝚛𝚘𝚞𝚙 },
     {
-      title: 'Action',
+      title: '𝐀𝐜𝐭𝐢𝐨𝐧',
       key: 'action',
-      visible: columnVisibility.action,
+      visible: columnVisibility.𝙰𝚌𝚝𝚒𝚘𝚗,
       render: (_, record) => (
         <div className="btn-group" role="group" aria-label="Actions">
           <Button
@@ -343,17 +344,19 @@ useEffect(() => {
   const pageSizeOptions = ['5', '10', '20', '50'];
 
   return (
-    <div className="group-list">
+    <div className="container">
       <h2>𝑮𝒓𝒐𝒖𝒑 𝑳𝒊𝒔𝒕</h2>
 
+      <div className="search-bar-container">
       <Input.Search
-        className="mb-3"
         placeholder="Search group name, parent group..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-
-      <Row gutter={[16, 16]}>
+</div>
+<Divider />
+ 
+<Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibility).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -369,11 +372,13 @@ useEffect(() => {
 
       <Divider />
 
+      <div className="table-container">
       <Table
         dataSource={currentGroups}
         columns={columns}
         pagination={false}
       />
+      </div>
 
       <Pagination
         current={currentPage}

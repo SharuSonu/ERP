@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 import { AppContext } from '../../../Context/AppContext';
 import { createGroup, fetchStockcategory } from '../../utils/RestApi';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
-import '../../../styles/StockGroupList.css';
+//import '../../../styles/StockGroupList.css';
+import '../../../styles/Formliststyle/Commonform.css';
+import '../../../styles/Formliststyle/Tableform.css';
 
 const StockCategoryList = ({ onSelectStockcategory }) => {
     const { companyName } = useContext(AppContext);
@@ -23,11 +25,11 @@ const StockCategoryList = ({ onSelectStockcategory }) => {
 
 // set column to display 
     const [columnVisibility, setColumnVisibility] = useState({
-        id: true,
-        Name: true,
-        Namealias: true,
-        Namegroup: true,
-        action: true,
+        𝙸𝙳: true,
+        𝙽𝚊𝚖𝚎: true,
+        𝙰𝚕𝚒𝚊𝚜: true,
+        𝙶𝚛𝚘𝚞𝚙: true,
+        𝙰𝚌𝚝𝚒𝚘𝚗: true,
       });
 
   const [editStockcategoryId, setEditStockcategoryId] = useState(null);
@@ -184,16 +186,16 @@ useEffect(() => {
   const currentStockcategorys = filteredStockcategorys.slice(indexOfFirstStockcategory, indexOfLastStockcategory);
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', visible: columnVisibility.id },
-    { title: 'Name', dataIndex: 'Name', key: 'Name', visible: columnVisibility.Name },
-    { title: 'Namealias', dataIndex: 'Namealias', key: 'Namealias', visible: columnVisibility.Namealias },
-    { title: 'Namegroup', dataIndex: 'Namegroup', key: 'Namegroup', visible: columnVisibility.Namegroup },
+    { title: '𝐈𝐃', dataIndex: 'id', key: 'id', visible: columnVisibility.𝙸𝙳 },
+    { title: '𝐍𝐚𝐦𝐞', dataIndex: 'Name', key: 'Name', visible: columnVisibility.𝙽𝚊𝚖𝚎 },
+    { title: '𝑨𝒍𝒊𝒂𝒔', dataIndex: 'Namealias', key: 'Namealias', visible: columnVisibility.𝙰𝚕𝚒𝚊𝚜 },
+    { title: '𝐆𝐫𝐨𝐮𝐩', dataIndex: 'Namegroup', key: 'Namegroup', visible: columnVisibility.𝙶𝚛𝚘𝚞𝚙 },
     {
-        title: 'Action',
+        title: '𝐀𝐜𝐭𝐢𝐨𝐧',
       key: 'action',
-      visible: columnVisibility.action,
+      visible: columnVisibility.𝙰𝚌𝚝𝚒𝚘𝚗,
       render: (_, record) => (
-        <div className="btn-StockGroup" role="StockGroup" aria-label="Actions">
+        <div className="btn-group" role="StockGroup" aria-label="Actions">
           <Button
             type="default"
             className="edit-button"
@@ -330,17 +332,21 @@ useEffect(() => {
   const pageSizeOptions = ['5', '10', '20', '50'];
 
   return (
-    <div className="StockGroup-list">
+    <div className="container">
       <h2>𝑺𝒕𝒐𝒄𝒌 𝑪𝒂𝒕𝒆𝒈𝒐𝒓𝒚 𝑳𝒊𝒔𝒕</h2>
 
+     
+      <div className="search-bar-container">
       <Input.Search
         className="mb-3"
         placeholder="Search StockGroup name, parent StockGroup..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+      </div>
 
-      <Row gutter={[16, 16]}>
+      
+      <Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibility).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -356,11 +362,13 @@ useEffect(() => {
 
       <Divider />
 
+      <div className="table-container">
       <Table
         dataSource={currentStockcategorys}
         columns={columns}
         pagination={false}
       />
+      </div>
 
       <Pagination
         current={currentPage}

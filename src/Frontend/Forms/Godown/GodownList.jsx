@@ -5,7 +5,9 @@ import { createGroup, fetchGodown } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
 
-import '../../../styles/Godown.css';
+//import '../../../styles/Godown.css';
+import '../../../styles/Formliststyle/Commonform.css';
+import '../../../styles/Formliststyle/Tableform.css';
 import { Message } from 'semantic-ui-react';
 
 const { Option } = Select;
@@ -21,11 +23,11 @@ const GodownList = ({ onSelectGodown}) => {
   const [pageSize, setPageSize] = useState(5);
   const [GodownOptions, setGodownOptions] = useState([]);
   const [columnVisibility, setColumnVisibility] = useState({
-    id: true,
-    Godownname: true,
-    Godownalias: true,
-    Godowngroup:true,
-    action: true,
+    𝙸𝙳: true,
+    𝙽𝚊𝚖𝚎: true,
+    𝙰𝚕𝚒𝚊𝚜: true,
+    𝙶𝚛𝚘𝚞𝚙:true,
+    𝙰𝚌𝚝𝚒𝚘𝚗: true,
   });
   const [editGodownId, setEditGodownId] = useState(null);
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -166,15 +168,15 @@ useEffect(() => {
   const currentGodown = filteredGodown.slice(indexOfFirstGodown, indexOfLastGodown);
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', visible: columnVisibility.id },
-    { title: 'Name', dataIndex: 'Godownname', key: 'Godownname', visible: columnVisibility.Godownname },
-    { title: 'Alias', dataIndex: 'Godownalias', key: 'Godownalias', visible: columnVisibility.Godownalias },
-    { title: 'Group', dataIndex: 'Godowngroup', key: 'Godowngroup', visible: columnVisibility.Godowngroup },
+    { title: '𝐈𝐃', dataIndex: 'id', key: 'id', visible: columnVisibility.𝙸𝙳 },
+    { title: '𝐍𝐚𝐦𝐞', dataIndex: 'Godownname', key: 'Godownname', visible: columnVisibility.𝙽𝚊𝚖𝚎 },
+    { title: '𝐀𝐥𝐢𝐚𝐬', dataIndex: 'Godownalias', key: 'Godownalias', visible: columnVisibility.𝙰𝚕𝚒𝚊𝚜 },
+    { title: '𝐆𝐫𝐨𝐮𝐩', dataIndex: 'Godowngroup', key: 'Godowngroup', visible: columnVisibility.𝙶𝚛𝚘𝚞𝚙 },
     
     {
-      title: 'Action',
+      title: '𝐀𝐜𝐭𝐢𝐨𝐧',
       key: 'action',
-      visible: columnVisibility.action,
+      visible: columnVisibility.𝙰𝚌𝚝𝚒𝚘𝚗,
       render: (_, record) => (
         <div className="btn-group" role="group" aria-label="Actions">
           <Button
@@ -318,17 +320,20 @@ useEffect(() => {
   const pageSizeOptions = ['5', '10', '20', '50'];
 
   return (
-    <div className="Godown-list">
+    <div className="container">
       <h2>𝑮𝒐𝒅𝒐𝒘𝒏 𝑳𝒊𝒔𝒕</h2>
 
+      <div className="search-bar-container">
       <Input.Search
         className="mb-3"
         placeholder="Search Godown name, Godown group..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+      </div>
+      <Divider />
 
-      <Row gutter={[16, 16]}>
+      <Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibility).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -342,13 +347,16 @@ useEffect(() => {
         ))}
       </Row>
 
+
       <Divider />
 
+      <div className="table-container">
       <Table
         dataSource={currentGodown}
         columns={columns}
         pagination={false}
       />
+      </div>
 
       <Pagination
         current={currentPage}

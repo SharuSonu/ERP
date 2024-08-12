@@ -5,8 +5,10 @@ import { AppContext } from '../../../Context/AppContext';
 import { createGroup, fetchStockGroups } from '../../utils/RestApi';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
 //import '../../../styles/StockGroupList.css';
-import '../../../styles/Godown.css';
+//import '../../../styles/Godown.css';
 
+import '../../../styles/Formliststyle/Commonform.css';
+import '../../../styles/Formliststyle/Tableform.css';
 //import dotenv from 'dotenv';
 //dotenv.config();
 
@@ -26,10 +28,10 @@ const StockGroupList = ({ onSelectStockGroup }) => {
   ];
   // State for column visibility
   const [columnVisibility, setColumnVisibility] = useState({
-    id: true,
-    name: true,
-    parentGroup: true,
-    action: true,
+    𝙸𝙳: true,    //Monospace text style format for Fileter titee//
+    𝙶𝚛𝚘𝚞𝚙: true,
+    𝚂𝚞𝚋𝙶𝚛𝚘𝚞𝚙: true,
+    𝙰𝚌𝚝𝚒𝚘𝚗: true,
   });
 
   const [editStockGroupId, setEditStockGroupId] = useState(null);
@@ -186,15 +188,15 @@ const StockGroupList = ({ onSelectStockGroup }) => {
   const currentStockGroups = filteredStockGroups.slice(indexOfFirstStockGroup, indexOfLastStockGroup);
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', visible: columnVisibility.id },
-    { title: 'Group', dataIndex: 'name', key: 'name', visible: columnVisibility.name },
-    { title: 'SubGroup', dataIndex: 'parentGroup', key: 'parentGroup', visible: columnVisibility.parentGroup },
+    { title: '𝐈𝐃', dataIndex: 'id', key: 'id', visible: columnVisibility.𝙸𝙳 },
+    { title: '𝐆𝐫𝐨𝐮𝐩', dataIndex: 'name', key: 'name', visible: columnVisibility.𝙶𝚛𝚘𝚞𝚙 },
+    { title: '𝐒𝐮𝐛 𝐆𝐫𝐨𝐮𝐩', dataIndex: 'parentGroup', key: 'parentGroup', visible: columnVisibility.𝚂𝚞𝚋𝙶𝚛𝚘𝚞𝚙 },
     {
-      title: 'Action',
+      title: '𝐀𝐜𝐭𝐢𝐨𝐧',
       key: 'action',
-      visible: columnVisibility.action,
+      visible: columnVisibility.𝙰𝚌𝚝𝚒𝚘𝚗,
       render: (_, record) => (
-        <div className="btn-StockGroup" role="StockGroup" aria-label="Actions">
+        <div className="btn-group" role="StockGroup" aria-label="Actions">
           <Button
             type="default"
             className="edit-button"
@@ -328,17 +330,20 @@ const StockGroupList = ({ onSelectStockGroup }) => {
   const pageSizeOptions = ['5', '10', '20', '50'];
 
   return (
-    <div className="StockGroup-list">
+    <div className="container">
       <h2>𝑺𝒕𝒐𝒄𝒌 𝑮𝒓𝒐𝒖𝒑 𝑳𝒊𝒔𝒕</h2>
 
+      <div className="search-bar-container">
       <Input.Search
         className="mb-3"
         placeholder="Search StockGroup name, parent StockGroup..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
+       </div>
+      <Divider />
 
-      <Row gutter={[16, 16]}>
+      <Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibility).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -354,11 +359,13 @@ const StockGroupList = ({ onSelectStockGroup }) => {
 
       <Divider />
 
+      <div className="table-container">
       <Table
         dataSource={currentStockGroups}
         columns={columns}
         pagination={false}
       />
+      </div>
 
       <Pagination
         current={currentPage}
