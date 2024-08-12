@@ -96,7 +96,7 @@ const GroupForm = () => {
   };
 
   return (
-    <div className="group-form">
+    <div className="common-form">
       <h4>𝑮𝒓𝒐𝒖𝒑 𝑪𝒓𝒆𝒂𝒕𝒊𝒐𝒏</h4>
       <Divider />
 
