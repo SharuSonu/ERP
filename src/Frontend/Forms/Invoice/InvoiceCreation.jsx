@@ -9,6 +9,9 @@ import { createSalesVoucher } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import axios from 'axios';
 
+
+const { Option } = Select;
+
 const taxRates = {
   CGST: 9,
   SGST: 9,
