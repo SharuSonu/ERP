@@ -1,70 +1,95 @@
 .sales-form {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .form-header {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .form-sections {
-    margin-bottom: 20px;
-  }
-  
-  .form-row {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-  }
-  
-  .form-row label {
-    flex: 0 0 150px; /* Adjust this value as needed */
-    font-weight: bold;
-    margin-right: 15px;
-  }
-  
-  .field-input, .select-input, .table-input, .field-textarea {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-  }
-  
-  .field-textarea {
-    min-height: 100px;
-  }
-  
-  .inventory-table, .ledgerentries-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  
-  .inventory-table th, .ledgerentries-table th,
-  .inventory-table td, .ledgerentries-table td {
-    border: 1px solid #d9d9d9;
-    padding: 10px;
-    text-align: left;
-  }
-  
-  .inventory-table th, .ledgerentries-table th {
-    background: #f0f0f0;
-  }
-  
-  .form-actions {
-    text-align: right;
-  }
-  
-  .form-actions .ant-btn {
-    margin-top: 10px;
-  }
-  
-  .field-input[readOnly] {
-    background: #f5f5f5;
-  }
-  
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.form-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.form-sections {
+  margin-bottom: 30px;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px; /* Adjusts spacing between label and input */
+}
+
+.form-row label {
+  flex: 0 0 160px; /* Adjusted for better alignment */
+  font-weight: 600;
+  color: #333;
+  margin-right: 20px;
+}
+
+.field-input, .select-input, .table-input, .field-textarea {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.field-input:focus, .select-input:focus, .field-textarea:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+.field-textarea {
+  min-height: 120px;
+  resize: vertical; /* Allows vertical resizing */
+}
+
+.inventory-table, .ledgerentries-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+.inventory-table th, .ledgerentries-table th,
+.inventory-table td, .ledgerentries-table td {
+  border: 1px solid #e0e0e0;
+  padding: 12px;
+  text-align: left;
+}
+
+.inventory-table th, .ledgerentries-table th {
+  background: #f7f7f7;
+  color: #555;
+}
+
+.form-actions {
+  text-align: right;
+  margin-top: 20px;
+}
+
+.form-actions .ant-btn {
+  margin-left: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form-actions .ant-btn:hover {
+  background-color: #0056b3;
+}
+
+.field-input[readOnly] {
+  background: #f0f0f0;
+  cursor: not-allowed;
+}

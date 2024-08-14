@@ -14,6 +14,7 @@ async function createSalesVoucher(reqBody) {
         ledgerEntries,
         billWiseDetails,
         orderDetails, 
+        Payment_Type,
         cmp
     } = reqBody;
 
@@ -30,9 +31,9 @@ async function createSalesVoucher(reqBody) {
         const salesLedgerValue = salesLedger;
 
         const [voucherResult] = await connection.query(`
-            INSERT INTO sales_vouchers (voucherTypeName, vouchernumber, parentvouchertype, voucherDate, partyAccount, salesLedger, narration, totalAmount, approvalStatus, approverId, approvalDate, approvalComments)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [voucherTypeName, voucherNumber, "Sales", voucherDate, partyAccount, salesLedgerValue, narration, totalAmount, 'Pending Approval', 0,`2024-06-20 22:10:56`,'']);
+            INSERT INTO sales_vouchers (voucherTypeName, vouchernumber, parentvouchertype, voucherDate, partyAccount, salesLedger, Payment_Type,narration, totalAmount, approvalStatus, approverId, approvalDate, approvalComments)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
+        `, [voucherTypeName, voucherNumber, "Sales", voucherDate, partyAccount, salesLedgerValue,  Payment_Type,narration, totalAmount,'Pending Approval', 0,`2024-06-20 22:10:56`,'']);
 
         const voucherId = voucherNumber;//voucherResult.insertId;
 

@@ -174,7 +174,7 @@ router.post('/create-db', async (req, res) => {
  )
             `);   
 
-            await connection.query(`CREATE TABLE ledger_bank_details (
+            await connection.query(`CREATE TABLE IF NOT EXISTS ledger_bank_details (
                 id int NOT NULL AUTO_INCREMENT,
                 ledgerId int NOT NULL,
                 transactionType varchar(50) DEFAULT NULL,
@@ -188,7 +188,7 @@ router.post('/create-db', async (req, res) => {
             );
 
             //ledgerbillwise
-            await connection.query(`CREATE TABLE ledger_billwise (
+            await connection.query(`CREATE TABLE IF NOT EXISTS ledger_billwise (
                 id int NOT NULL AUTO_INCREMENT,
                 ledgerId int NOT NULL,
                 date date DEFAULT NULL,
@@ -355,6 +355,7 @@ router.post('/create-db', async (req, res) => {
                 voucherDate date DEFAULT NULL,
                 partyAccount varchar(255) DEFAULT NULL,
                 salesLedger varchar(255) DEFAULT NULL,
+                Payment_type ENUM('Cards', 'Cash', 'IMPS', 'UPI', 'Not Applicable') DEFAULT 'Not Applicable',
                 narration text,
                 totalAmount float NOT NULL,
                 approvalStatus enum('All','Draft','Confirmed','Declined','Expired','Sent','Partially Invoiced','Accepted','Invoiced','Closed','Pending Approval','Approved','Partially Paid','Unpaid','Overdue','Payment Initiated','Paid','Rejected') DEFAULT 'Pending Approval',

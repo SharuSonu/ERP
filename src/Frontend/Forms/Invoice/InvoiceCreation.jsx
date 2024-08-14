@@ -607,12 +607,12 @@ useEffect(() => {
                   <tr>
                     <th className="item-name-col">Item Name</th>
                     <th>Quantity</th>
-                    <th>Rate</th>
+                    <th style={{ width: '15%' }}>Rate</th>
                     <th>Discount (%)</th>
                     <th>Amount</th>
                     <th>GstRate</th>
                     <th>Tax Amount</th>
-                    <th>Action</th>
+                    <th> Action</th>
                   </tr>
                 </thead>
                 <FieldArray name="inventory">
@@ -772,25 +772,21 @@ useEffect(() => {
             </div>
 
             <div className="form-section">
-      <div className="form-row">
-        <label htmlFor="paymentType">Payment Type:</label>
-        <Field name="paymentType">
-          {({ field, form }) => (
-            <Select
-              id="paymentType"
-              {...field}
-              onChange={(value) => form.setFieldValue('paymentType', value)}
-              className="field-input"
-            >
-              <Option value="cash">Cash</Option>
-              <Option value="imps">IMPS</Option>
-              <Option value="card">Card</Option>
-              <Option value="upi">UPI</Option>
-            </Select>
-          )}
-        </Field>
-        </div>
+    
 
+  <div className="form-row">
+    <label htmlFor="options">Payment Type:</label>
+    <Field name="Payment_Type" as="select" className="field-input">
+      <option value="">Not Applicable</option>
+      <option value="Cards">Cards</option>
+      <option value="IMPS">IMPS</option>
+      <option value="UPI">UPI</option>
+      <option value="Cash">Cash</option>
+    </Field>
+  </div>
+</div>
+
+          
               <div className="form-section">
               <div className="form-row">
                 <label>Narration:</label>
@@ -801,7 +797,7 @@ useEffect(() => {
                 <label>Total Amount:</label>
                 <Field name="totalAmount" type="text" readOnly className="field-input" value={values.totalAmount.toString()} />
               </div>
-            </div>
+            
 
             <div className="form-actions">
               <Button type="primary" htmlType="submit">
