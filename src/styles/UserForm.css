@@ -1,0 +1,54 @@
+/* UserForm.css (or styled-components) */
+
+.user-form-container {
+    width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fdfdfd;
+    border: 1px solid #d9d9d9;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+  
+  .user-form {
+    max-width: 100%;
+  }
+  
+  .site-form-item-icon {
+    color: rgba(0, 0, 0, 0.25);
+  }
+  
+  .user-form .ant-form-item-label {
+    text-align: left;
+    font-weight: bold;
+    font-size: 16px;
+  }
+  
+  .user-form .ant-form-item-control-input-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-form .ant-btn {
+    margin-right: 10px;
+  }
+  
+  .user-form .ant-space {
+    margin-top: 10px;
+  }
+  
+  .user-form .ant-btn-primary {
+    background-color: #1890ff;
+    border-color: #1890ff;
+  }
+  
+  .user-form .ant-btn-primary:hover {
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+  }
+  
+  .user-form .ant-btn-primary:focus, .user-form .ant-btn-primary:active {
+    background-color: #096dd9;
+    border-color: #096dd9;
+  }
+  

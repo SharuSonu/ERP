@@ -1,0 +1,120 @@
+/* ProductList.module.css */
+
+/* Search bar */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group input[type="text"] {
+    padding: 8px 10px;
+    border-radius: 8px;
+    outline: none;
+}
+
+.input-group-append button {
+  border-radius: 25px;
+}
+
+/* Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.table th,
+.table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+}
+
+.table tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Action buttons */
+.btn-group .btn {
+  border-radius: 25px;
+  padding: 8px 16px;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.btn-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.btn-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.btn-group .btn:not(:last-child) {
+  margin-right: 10px;
+}
+
+/* Pagination */
+.pagination {
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.page-link {
+  color: #007bff;
+  border: 1px solid #007bff;
+  background-color: #fff;
+  padding: 6px 12px;
+  border-radius: 25px;
+}
+
+.page-link:hover {
+  background-color: #f0f0f0;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
+}
+
+.page-item.disabled .page-link {
+  pointer-events: none;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #6c757d;
+}
+
+.print-button {
+  background-color: #ff8018; /* Blue color for Print button */
+  color: #fff;
+  border: none;
+}
+
+.export-button {
+  background-color: #1ac4ad; /* Green color for Export button */
+  color: #fff;
+  border: none;
+}
+
+.edit-button {
+  background-color: #1890ff; /* Red color for Edit button */
+  color: #fff;
+  border: none;
+}
+
+/* Ensure button spacing */
+.btn-group .ant-btn {
+  margin-right: 8px;
+}

@@ -1,0 +1,117 @@
+/* TaxesForm.css */
+  .taxes-form-container {
+    background: #f9fcff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px;
+  }
+
+  .main-container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: flex-start; 
+    width: 100%; 
+    max-height: calc(100vh - 50px); 
+    overflow-y: auto; 
+  }
+  
+  .taxes-form-container h3 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .table-section h3 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .form-section {
+    flex: 1; 
+    max-width: 500px; 
+  }
+  
+  .table-section {
+    flex: 2; 
+    background: #f9fcff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .taxes-form {
+    width: 100%;
+  }
+  
+  .taxes-form .ant-form-item {
+    margin-bottom: 20px;
+  }
+  
+  .taxes-form .ant-input-affix-wrapper .ant-input {
+    padding-left: 40px; /* Adjusted for icon space */
+  }
+  
+  .taxes-form .ant-btn {
+    width: 100px;
+  }
+
+  .taxes-form .submit-button {
+    width: 120px;
+    height: 40px;
+    text-align: center;
+  }
+  
+  .taxes-form .reset-button {
+    width: 120px;
+    height: 40px;
+    text-align: center;
+    
+  }
+  .taxes-form .cancel-button {
+    width: 120px;
+    height: 40px;
+    text-align: center;
+    
+  }
+
+  .taxes-form .edit-button {
+    width: 120px;
+    height: 40px;
+    text-align: center;
+    
+  }
+  .taxes-form .ant-space {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .taxes-form .ant-message {
+    margin-top: 20px;
+  }
+
+  .table-section{
+    max-width: 600px;
+    margin: 20px;
+  }
+  .tax-form-table .ant-table-thead > tr > th {
+    font-size: 16px; /* Adjust this value as needed */
+    font-weight: bold;
+    background: #f0f0f0; /* Light background for the header */
+    color: #333; /* Darker text color */
+    padding: 12px 8px; /* Adjust padding as needed */
+  }
+  /* Custom scrollbar styles */
+.main-container::-webkit-scrollbar {
+  width: 10px; /* Width of the scrollbar */
+}
+
+.main-container::-webkit-scrollbar-thumb {
+  background-color: #888; /* Color of the scrollbar thumb */
+  border-radius: 5px; /* Rounded corners for the thumb */
+}
+
+.main-container::-webkit-scrollbar-track {
+  background-color: #f0f0f0; /* Color of the scrollbar track */
+}
