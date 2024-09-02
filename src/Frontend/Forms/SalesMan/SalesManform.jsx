@@ -11,7 +11,6 @@ import Header from '../../components/Header';
 import { createSalesman, fetchSalesman } from '../../utils/RestApi';
 import { useNavigate } from 'react-router-dom';
 import SalesmanList from './SalesManlist';
-import '../../../styles/Salesman.css';
 
 
 const SalesManForm = () => {
@@ -68,7 +67,7 @@ const SalesManForm = () => {
     const onFinish = async (values) => {
       setLoading(true);
       try {
-          const response = await axios.post('http://localhost:5000/api/create-Salesman', {
+          const response = await axios.post(BASE_URL+'/create-Salesman', {
             ...values,
             companyName: companyName,
           });

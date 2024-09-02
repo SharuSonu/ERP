@@ -35,14 +35,44 @@ async function createSalesVoucher(reqBody) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)
         `, [voucherTypeName, voucherNumber, "Sales", voucherDate, partyAccount, salesLedgerValue,  Payment_Type,narration, totalAmount,'Pending Approval', 0,`2024-06-20 22:10:56`,'']);
 
-        const voucherId = voucherNumber;//voucherResult.insertId;
-
+        //const voucherId = voucherNumber;//voucherResult.insertId;
+        const voucherId = voucherResult.insertId;
+            
         // Insert into sales_inventory table
         for (const item of inventory) {
-            await connection.query(`
-                INSERT INTO sales_inventory (voucherId, voucherDate, itemName, quantity, rate, discount, amount)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            `, [voucherId, voucherDate, item.itemName.value, item.quantity, item.rate, item.discount, item.amount]);
+            const [inventoryResult] = await connection.query(`
+                INSERT INTO sales_inventory (voucherId, voucherDate, itemName, quantity, rate, discount, amount, trackingDate, order_no, tracking_no, orderDate)
+                VALUES (?, ?, ?, ?, ?, ?, ?,?,?,?,?)
+            `, [voucherId, voucherDate, item.itemName.value, item.quantity, item.rate, item.discount, item.amount, voucherDate, item.orderNo, voucherNumber, null]);
+        
+                //console.log(item.batchAllocations);
+             for (const batch of item.batchAllocations) {
+                //console.log(batch.trackingNo.value);
+                const inventoryId = inventoryResult.insertId;
+                const godownval = batch.godown.value || 'Main Location';
+                await connection.query(`
+                    INSERT INTO sales_batchdetails (voucherId, voucherDate, tracking_no, order_no, itemname, godown, batch, quantity, rate, discount, amount, invId, trackingDate, orderDate)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [
+                    voucherId, 
+                    voucherDate, 
+                    batch.trackingNo.value || '', 
+                    batch.orderNo.value || '', 
+                    item.itemName.value,
+                    godownval || '', 
+                    batch.batch.value || '',  
+                    batch.quantity, 
+                    batch.rate, 
+                    batch.discount, 
+                    batch.amount,
+                    inventoryId,
+                    voucherDate,
+                    null
+                ]);
+            }       
+        
+        
+        
         }
 
         // Insert into sales_ledger_entries table

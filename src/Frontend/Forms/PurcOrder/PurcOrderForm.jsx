@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Select from 'react-select';
 import { Formik, Form, Field, FieldArray } from 'formik';
-import { Button, Divider, message } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Modal, Input, Button, Divider,  Table, DatePicker, Space, message } from 'antd';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import '../../../styles/PurcOrder/PurcOrderForm.css';
 import { createPurcOrderVoucher } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
@@ -47,16 +47,96 @@ const PurcOrderForm = () => {
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [inventoryOptions, setInventoryOptions] = useState([]);
+  const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
+  const [currentInventoryIndex, setCurrentInventoryIndex] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [gstRate, setGstRate] = useState('');
   const [productId, setProductId] = useState(0);
   const [ledgerOptions, setLedgerOptions] = useState([]);
   const [taxInfo, setTaxInfo] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [orders, setOrders] = useState([]);
+  
+  const [selectedItemIndex, setSelectedItemIndex] = useState(null);
+  const [selectedItemName, setSelectedItemName] = useState('');
+
+  const [orderOptions, setOrderOptions] = useState([
+    { value: 'NotApplicable', label: 'NotApplicable' },
+    { value: 'EndofList', label: 'EndofList' }
+  ]);
+  const [trackingOptions, setTrackingOptions] = useState([
+    { value: 'NotApplicable', label: 'NotApplicable' },
+    { value: 'EndofList', label: 'EndofList' }
+  ]);
+
+  const [GodownOptions, setGodownOptions] = useState([
+    { value: 'Main Location', label: 'Main Location' }
+  ]);
+
+  const [batchOptions, setBatchOptions] = useState([
+    { value: 'Primary', label: 'Primary' }
+  ]);
+
+
+  // Fetch options for OrderNo and TrackingNo (simulate fetching from an API)
+  useEffect(() => {
+    // Simulate API calls to fetch data
+    const fetchOptions = async () => {
+      // Replace with your actual API calls
+      //const fetchedOrders = await fetch('/api/orders').then(res => res.json());
+      //const fetchedTrackings = await fetch('/api/trackings').then(res => res.json());
+     /* 
+      setOrderOptions(prevOptions => [
+        ...prevOptions,
+        ...fetchedOrders.map(order => ({ value: order.id, label: order.name }))
+      ]);*/
+      
+      setTrackingOptions(prevOptions =>[
+        ...prevOptions
+      ]);
+
+
+      setGodownOptions(prevOptions =>[
+        ...prevOptions
+        //...fetchedTrackings.map(tracking => ({ value: Godown.id, label: Godown.name }))
+      ]);
+    };
+
+    fetchOptions();
+  }, []);
 
   
+  const handleShowBatchModal = (index) => {
+    setCurrentInventoryIndex(index);
+    setIsBatchModalVisible(true);
+  };
+
+  const handleBatchModalOk = (index, setFieldValue, values) => {
+    const batchAllocations = values.inventory[index].batchAllocations;
+
+    // Sum up quantities, rates, and amounts from batch allocations
+    const totalQuantity = batchAllocations.reduce((acc, curr) => acc + parseFloat(curr.quantity || 0), 0);
+    const totalAmount = batchAllocations.reduce((acc, curr) => acc + parseFloat(curr.amount || 0), 0);
+
+    // Calculate the rate based on the total amount and total quantity
+    //const rate = totalQuantity > 0 ? totalAmount / totalQuantity : 0;
+    const rate = batchAllocations.length > 0 ? parseFloat(batchAllocations[0].rate || 0) : 0;
+    
+    // Update inventory fields
+    setFieldValue(`inventory.${index}.quantity`, totalQuantity);
+    setFieldValue(`inventory.${index}.rate`, rate.toFixed(2));
+    setFieldValue(`inventory.${index}.amount`, totalAmount.toFixed(2));
+
+    // Close the modal
+    setIsBatchModalVisible(false);
+  };
+
+  const handleBatchModalCancel = () => {
+    setIsBatchModalVisible(false);
+  };
+
   const handleSetupDatabase = async () => {
     setLoading(true);
-
     
   };
 
@@ -136,6 +216,10 @@ const PurcOrderForm = () => {
 
   const handleItemChange = async (option, index, setFieldValue, values) => {
     setFieldValue(`inventory.${index}.itemName`, option);
+    setSelectedItemIndex(index);
+    setSelectedItemName(option.label);
+    setIsBatchModalVisible(true);
+    handleShowBatchModal(index);
     try {
       
       const response = await axios.get(BASE_URL+'/stockitem', {
@@ -370,6 +454,7 @@ const PurcOrderForm = () => {
     const totalAmount = totalinvAmount + totalLedgerEntriesAmount;
 
     setFieldValue('totalAmount', parseFloat(totalAmount).toFixed(2));
+    
     //console.log("ledger entries total:", totalLedgerEntriesAmount);
 
     // Debugging output
@@ -379,6 +464,84 @@ const PurcOrderForm = () => {
     }, 0);
   
   };
+
+
+  //BatchField
+  const handleBatchFieldChange = (e, inventoryIndex, batchIndex, field, setFieldValue, values) => {
+    //alert('Hi');
+    // Parse the new value from the event
+    const value = parseFloat(e.target.value) || 0;
+  
+    // Update the Formik field value
+    setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.${field}`, value.toString(), false);
+  
+    // Create a copy of the current values
+    const updatedValues = { ...values };
+    updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex][field] = value;
+  
+    // Retrieve the current values for quantity, rate, and discount
+    const quantity = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].quantity || 0;
+    const rate = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].rate || 0;
+    const discount = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].discount || 0;
+
+    setFieldValue(`inventory.${inventoryIndex}.discount`, discount);
+    updatedValues.inventory[inventoryIndex].discount = discount;
+  
+    //console.log("Batch Qty ",quantity);
+    // Calculate the amount: Quantity * Rate - Discount
+    //const amount = (quantity * rate) - discount;
+
+    // Retrieve gst_rate from the inventory entry
+  const gst_rate = updatedValues.inventory[inventoryIndex].gstrate || 0;
+  let itemnameval = updatedValues.inventory[inventoryIndex].itemName || '';
+  setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.itemname`, itemnameval.value);
+  //console.log("GST RATE : ", gst_rate);  
+  // Calculate the amount
+  const amount = calculateAmount(quantity, rate, discount);
+  setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.amount`, parseFloat(amount).toFixed(2));
+  updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].amount = amount;
+
+  // Calculate the taxable amount
+  const taxableAmount = field === 'amount' ? value : updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].amount;
+  const taxamount = (Number(gst_rate) * Number(taxableAmount)) / 100;
+  //console.log("GST AMOUNT : ", taxamount);  
+  setFieldValue(`inventory.${inventoryIndex}.taxamount`, taxamount.toFixed(2));
+  updatedValues.inventory[inventoryIndex].taxamount = taxamount.toFixed(2);
+
+  
+    // Recalculate the total amount for all batches in this inventory item
+    const totalBatchAmount = updatedValues.inventory[inventoryIndex].batchAllocations.reduce(
+      (total, batch) => total + parseFloat(batch.amount || 0),
+      0
+    );
+  
+    // Update the total amount for this inventory item
+    setFieldValue(`inventory.${inventoryIndex}.amount`, parseFloat(totalBatchAmount).toFixed(2));
+    updatedValues.inventory[inventoryIndex].amount = totalBatchAmount;
+    // Recalculate the grand total including ledger entries
+    
+    setTimeout(() => {
+    
+      const updatedLedgerEntries = updateLedgerEntries(values, setFieldValue);
+      const totalinvAmount = calculateInventoryTotal(updatedValues.inventory);
+            
+    const totalLedgerEntriesAmount = calculateLedgerEntryTotal(updatedLedgerEntries);
+    //console.log("Inv Total: ", totalinvAmount);
+    //console.log("Led Total: ", totalLedgerEntriesAmount);
+    
+    const totalAmount = totalinvAmount + totalLedgerEntriesAmount;
+
+    setFieldValue('totalAmount', parseFloat(totalAmount).toFixed(2));
+    
+    //console.log("ledger entries total:", totalLedgerEntriesAmount);
+
+    // Debugging output
+    //console.log("Updated Values:", updatedValues);
+    //console.log("Total Ledger Entries Amount:", totalLedgerEntriesAmount);
+    //console.log("Total Amount:", totalAmount);
+    }, 0);
+  };
+  
 
   const calculateInventoryTotal = (inventory) => {
     return inventory.reduce((total, item) => parseFloat(total) + parseFloat(item.amount), 0);
@@ -571,6 +734,235 @@ const PurcOrderForm = () => {
                             />
                           </td>
                           <td>
+                          <Modal
+                            title="Batch Details"
+                            visible={isBatchModalVisible && currentInventoryIndex === index}
+                            onOk={() => handleBatchModalOk(index, setFieldValue, values)}
+                            onCancel={handleBatchModalCancel}
+                            width={1400}
+                          >
+                            <p>Selected Item Index: {selectedItemIndex}</p>
+                            <p>Selected Item Name: {selectedItemName}</p>
+                            <FieldArray name={`inventory.${index}.batchAllocations`}>
+                              {({ push, remove }) => (
+                                <>
+                                  <Table
+                                    dataSource={values.inventory[index].batchAllocations}
+                                    columns={[
+                                      {
+                                        title: 'Tracking No',
+                                        dataIndex: 'trackingNo',
+                                        key: 'trackingNo',
+                                        width: 200,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.trackingNo`}>
+                                            {({ field, form }) => (
+                                                <Select
+                                                      {...field}
+                                                       value={field.value || undefined} // Ensure the value is controlled
+                                                      onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.trackingNo`, value)}
+                                                      options={trackingOptions}
+                                                      />
+                                                    )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Order No',
+                                        dataIndex: 'orderNo',
+                                        key: 'orderNo',
+                                        width: 200,
+                                        render: (text, record, idx) => (
+                                        
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.orderNo`}>
+                                          {({ field, form }) => (
+                                              <Select
+                                                    {...field}
+                                                     value={field.value || undefined} // Ensure the value is controlled
+                                                    onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.orderNo`, value)}
+                                                    options={orderOptions}
+                                                    />
+                                                  )}
+                                        </Field>
+
+                                        ),
+                                      },
+                                      {
+                                        title: 'itemname',
+                                        dataIndex: 'itemname',
+                                        key: 'itemname',
+                                        width: 200,
+                                        hidden: true,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.itemname`}>
+                                            {({ field, form }) => (
+                                              <input
+                                                type="text" // Ensure it's hidden if you don't want it displayed
+                                                {...field}
+                                                value={selectedItemName || ''} // Ensure the correct value is passed
+                                                onChange={(e) => {
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.itemname`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Godown',
+                                        dataIndex: 'godown',
+                                        key: 'godown',
+                                        width: 200,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.godown`}>
+                                          {({ field, form }) => (
+                                              <Select
+                                                    {...field}
+                                                     value={field.value || undefined} // Ensure the value is controlled
+                                                    onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.godown`, value)}
+                                                    options={GodownOptions}
+                                                    />
+                                                  )}
+                                        </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Batch',
+                                        dataIndex: 'batch',
+                                        key: 'batch',
+                                        width: 150,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.batch`}>
+                                          {({ field, form }) => (
+                                              <Select
+                                                    {...field}
+                                                     value={field.value || undefined} // Ensure the value is controlled
+                                                    onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.batch`, value)}
+                                                    options={batchOptions}
+                                                    />
+                                                  )}
+                                        </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Quantity',
+                                        dataIndex: 'quantity',
+                                        key: 'quantity',
+                                        width: 100,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.quantity`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'quantity', form.setFieldValue, form.values);
+                                                  // It's a good idea to explicitly call `form.setFieldValue` here if necessary
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.quantity`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Rate',
+                                        dataIndex: 'rate',
+                                        key: 'rate',
+                                        width: 130,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.rate`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'rate', form.setFieldValue, form.values);
+                                                  // Ensure Formik value is updated
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.rate`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Discount',
+                                        dataIndex: 'discount',
+                                        key: 'discount',
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.discount`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'discount', form.setFieldValue, form.values);
+                                                  // Ensure Formik value is updated
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.discount`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Amount',
+                                        dataIndex: 'amount',
+                                        key: 'amount',
+                                        width: 150,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.amount`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'amount', form.setFieldValue, form.values);
+                                                  // Ensure Formik value is updated
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.amount`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Action',
+                                        key: 'action',
+                                        render: (text, record, idx) => (
+                                          <Button
+                                            type="danger"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => remove(idx)}
+                                          />
+                                        ),
+                                      },
+                                    ]}
+                                    pagination={false}
+                                    rowKey={(record, idx) => idx}
+                                  />
+                                  <Button
+                                    type="dashed"
+                                    onClick={() =>
+                                      push({
+                                        itemname:'',
+                                        trackingNo: '',
+                                        orderNo: '',
+                                        godown: 'NotApplicable',
+                                        batch: '',
+                                        quantity: '',
+                                        rate: '',
+                                        discount: '',
+                                        amount: '',
+                                      })
+                                    }
+                                    block
+                                    icon={<PlusOutlined />}
+                                  >
+                                    Add Entry
+                                  </Button>
+                                </>
+                              )}
+                            </FieldArray>
+                          </Modal>
+
                             <Button
                               type="danger"
                               icon={<DeleteOutlined />}

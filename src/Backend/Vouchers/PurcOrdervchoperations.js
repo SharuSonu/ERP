@@ -30,10 +30,35 @@ async function createPurcOrderVoucher(reqBody) {
 
         // Insert into purcorder_inventory table
         for (const item of inventory) {
-            await connection.query(`
-                INSERT INTO purcorder_inventory (voucherId, voucherDate, itemName, quantity, rate, discount, amount)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            `, [voucherId, voucherDate, item.itemName.value, item.quantity, item.rate, item.discount, item.amount]);
+            const [inventoryResult] = await connection.query(`
+                INSERT INTO purcorder_inventory (voucherId, voucherDate, itemName, quantity, rate, discount, amount, trackingDate, order_no, tracking_no, orderDate)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, [voucherId, voucherDate, item.itemName.value, item.quantity, item.rate, item.discount, item.amount,null,voucherNumber,'',voucherDate]);
+
+            const inventoryId = inventoryResult.insertId;
+             // Insert into purchorder_batchdetails table for each batch allocation
+             for (const batch of item.batchAllocations) {
+                await connection.query(`
+                    INSERT INTO purchorder_batchdetails (voucherId, voucherDate, tracking_no, order_no, itemname, godown, batch, quantity, rate, discount, amount, invId, trackingDate, orderDate)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                `, [
+                    voucherId, 
+                    voucherDate, 
+                    batch.trackingNo.value, 
+                    voucherNumber, 
+                    item.itemName.value, 
+                    batch.godown.value || 'Main Location', 
+                    batch.batch.value || '',  
+                    batch.quantity, 
+                    batch.rate, 
+                    batch.discount, 
+                    batch.amount,
+                    inventoryId,
+                    null,
+                    null
+
+                ]);
+            }
         }
 
         // Insert into purchase_ledger_entries

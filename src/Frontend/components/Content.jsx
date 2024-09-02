@@ -36,6 +36,7 @@ import GodownForm from '../Forms/Godown/GodownForm';
 import PurcOrderForm from '../Forms/PurcOrder/PurcOrderForm';
 import AllPurcOrderForm from '../Forms/PurcOrder/AllPurcOrder';
 import ReceiptNoteForm from '../Forms/ReceiptNote/ReceiptNoteForm';
+import AllReceiptNoteForm from '../Forms/ReceiptNote/AllReceiptNote';
 
 const Content = () => {
   const [currentPage, setCurrentPage] = useState('Dashboard');
@@ -103,6 +104,8 @@ const Content = () => {
 
       case 'ReceiptNoteCreation':
         return <ReceiptNoteForm/>;
+      case 'ReceiptNote':
+        return <AllReceiptNoteForm/>;
       case 'Reports':
         return <div>Reports</div>;
       case 'ALLInvoices':

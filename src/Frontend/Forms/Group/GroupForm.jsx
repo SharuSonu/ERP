@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Form, Input, Button, Select, Divider } from 'antd';
 import { createGroup, fetchGroups } from '../../utils/RestApi'; // Assuming correct import path
 import { AppContext } from '../../../Context/AppContext';
-import '../../../styles/GroupForm.css';
 
 const { Option } = Select;
 

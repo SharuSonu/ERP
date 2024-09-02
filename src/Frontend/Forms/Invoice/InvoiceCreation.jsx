@@ -1,16 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Select from 'react-select';
-import { Formik, Form, Field, FieldArray} from 'formik';
-import {Row, Col, Button, Divider,message, Modal,Input,Radio } from 'antd';
-import { DeleteOutlined, SettingOutlined  } from '@ant-design/icons';
-//import '../../../styles/Invoice/InvoiceForm.css';
-import '../../../styles/Vouchercreation.css';
+import { Formik, Form, Field, FieldArray } from 'formik';
+import { Button, Divider,message } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
+import '../../../styles/Invoice/InvoiceForm.css';
 import { createSalesVoucher } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import axios from 'axios';
-
-
-const { Option } = Select;
 
 const taxRates = {
   CGST: 9,
@@ -52,6 +48,8 @@ const InvoiceForm = () => {
   const [Salesmanoptions,setSalesmanOptions]=useState([]);
   const [loading, setLoading] = useState(false);
   const [inventoryOptions, setInventoryOptions] = useState([]);
+  const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
+  const [currentInventoryIndex, setCurrentInventoryIndex] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [gstRate, setGstRate] = useState('');
   const [productId, setProductId] = useState(0);
@@ -59,22 +57,13 @@ const InvoiceForm = () => {
   const [taxInfo, setTaxInfo] = useState([]);
   const [vchDate, setVchDate] = useState(getCurrentDateFormatted());
   const [DiscountLimit, setDiscountLimit] = useState(0);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [modalValue, setModalValue] = useState('');
-  const [autoGenerate, setAutoGenerate] = useState(true);
-  const [prefix, setPrefix] = useState('VCH-'); // Default prefix
-  const [nextNumber, setNextNumber] = useState(''); // Default empty
-  const [manualNumber, setManualNumber] = useState('');
-
-
-  
 
   
   const handleSetupDatabase = async () => {
     setLoading(true);
 
     try {
-      await axios.post('http://localhost:5000/api/setup-salesdatabase', { cmp: companyName});
+      await axios.post(BASE_URL+'/setup-salesdatabase', { cmp: companyName});
       message.success('Database setup completed successfully');
     } catch (error) {
       console.error('Error setting up database:', error);
@@ -84,6 +73,23 @@ const InvoiceForm = () => {
     }
   };
 
+  const [orderOptions, setOrderOptions] = useState([
+    { value: 'NotApplicable', label: 'NotApplicable' },
+    { value: 'EndofList', label: 'EndofList' }
+  ]);
+  const [trackingOptions, setTrackingOptions] = useState([
+    { value: 'NotApplicable', label: 'NotApplicable' },
+    { value: 'EndofList', label: 'EndofList' }
+  ]);
+
+  const [GodownOptions, setGodownOptions] = useState([
+    { value: 'Main Location', label: 'Main Location' }
+  ]);
+
+  const [batchOptions, setBatchOptions] = useState([
+    { value: 'Primary', label: 'Primary' }
+  ]);
+
   useEffect(() => {
     const storedCompanyName = localStorage.getItem('companyName');
     if (storedCompanyName) {
@@ -91,12 +97,41 @@ const InvoiceForm = () => {
     }
   }, [setCompanyName]);
 
+  const handleShowBatchModal = (index) => {
+    setCurrentInventoryIndex(index);
+    setIsBatchModalVisible(true);
+  };
+
+  const handleBatchModalOk = (index, setFieldValue, values) => {
+    const batchAllocations = values.inventory[index].batchAllocations;
+
+    // Sum up quantities, rates, and amounts from batch allocations
+    const totalQuantity = batchAllocations.reduce((acc, curr) => acc + parseFloat(curr.quantity || 0), 0);
+    const totalAmount = batchAllocations.reduce((acc, curr) => acc + parseFloat(curr.amount || 0), 0);
+
+    // Calculate the rate based on the total amount and total quantity
+    //const rate = totalQuantity > 0 ? totalAmount / totalQuantity : 0;
+    const rate = batchAllocations.length > 0 ? parseFloat(batchAllocations[0].rate || 0) : 0;
+    
+    // Update inventory fields
+    setFieldValue(`inventory.${index}.quantity`, totalQuantity);
+    setFieldValue(`inventory.${index}.rate`, rate.toFixed(2));
+    setFieldValue(`inventory.${index}.amount`, totalAmount.toFixed(2));
+
+    // Close the modal
+    setIsBatchModalVisible(false);
+  };
+
+  const handleBatchModalCancel = () => {
+    setIsBatchModalVisible(false);
+  };
+
 
   useEffect(() => {
     const fetchSuppliers = async () => {
       setLoading(true); 
       try {
-        const response = await axios.get('http://localhost:5000/api/ledgers', {
+        const response = await axios.get(BASE_URL+'/ledgers', {
           params: { companyName }
         });
         const options = response.data.map(ledger => ({
@@ -114,7 +149,7 @@ const InvoiceForm = () => {
     const fetchProducts = async () => {
       setLoadingProducts(true); 
       try {
-        const response = await axios.get('http://localhost:5000/api/products', {
+        const response = await axios.get(BASE_URL+'/products', {
           params: { companyName }
         });
         const options = response.data.map(product => ({
@@ -140,7 +175,7 @@ const InvoiceForm = () => {
   useEffect(() => {
     const fetchTaxes = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/taxes', {
+        const response = await axios.get(BASE_URL+'/taxes', {
           params: { companyName }
         });
         const fetchedTaxInfo = response.data.map(tax => ({ taxid: tax.id, taxname : tax.taxname, taxrate : tax.taxrate, taxtype: tax.taxtype }));
@@ -163,7 +198,7 @@ useEffect(() => {
   const fetchData = async () => {
     setLoading(true); // Set loading state to true while fetching data
     try {
-      const response = await axios.get('http://localhost:5000/api/SalesmanList', {
+      const response = await axios.get(BASE_URL+'/SalesmanList', {
         params: {
           companyName: companyName // Pass the companyName as a parameter
         }
@@ -188,16 +223,20 @@ useEffect(() => {
 
   const handleItemChange = async (option, index, setFieldValue, values) => {
     setFieldValue(`inventory.${index}.itemName`, option);
+    setSelectedItemIndex(index);
+    setSelectedItemName(option.label);
+    setIsBatchModalVisible(true);
+    handleShowBatchModal(index);
     try {
       
-      const response = await axios.get('http://localhost:5000/api/stockitem', {
+      const response = await axios.get(BASE_URL+'/stockitem', {
         params: { companyName, productName: option.label }
       });
       const product = response.data;
       //console.log(product);
       const vchDate = values.voucherDate;
       //console.log(values.voucherDate);
-      const response_ProdSellingPrice = await axios.get('http://localhost:5000/api/lastSellingPrice', {
+      const response_ProdSellingPrice = await axios.get(BASE_URL+'/lastSellingPrice', {
         params: { companyName, productId:  product[0].id, userName, vchDate }
       });
 
@@ -212,7 +251,7 @@ useEffect(() => {
         setFieldValue(`inventory.${index}.rate`, 0.00);
       }
 
-      const response_ProdDiscount = await axios.get('http://localhost:5000/api/lastDiscount', {
+      const response_ProdDiscount = await axios.get(BASE_URL+'/lastDiscount', {
         params: { companyName, productId:  product[0].id, userName, vchDate }
       });
       const ProdDiscountRes = response_ProdDiscount.data;
@@ -230,7 +269,7 @@ useEffect(() => {
         setFieldValue(`inventory.${index}.discount`, 0.00);
       }
 
-      const response_gstrate = await axios.get('http://localhost:5000/api/gst-rate', {
+      const response_gstrate = await axios.get(BASE_URL+'/gst-rate', {
         params: { companyName, productId:  product[0].id }
       });
       
@@ -270,7 +309,7 @@ useEffect(() => {
         params: { companyName, particulars: option.label }
       });*/
       //const ledtaxid = response.data;
-    const response_gstrate = await axios.get('http://localhost:5000/api/ledtaxrate', {
+    const response_gstrate = await axios.get(BASE_URL+'/ledtaxrate', {
       params: { companyName, particulars: option.label }
     });
     const ledtaxrate = response_gstrate.data;
@@ -436,7 +475,7 @@ useEffect(() => {
     const rate = field === 'rate' ? value : updatedValues.inventory[index].rate;
     const discount = field === 'discount' ? value : updatedValues.inventory[index].discount;
 
-    if (field === 'discount' && value > DiscountLimit) {
+    if (field === 'discount' && value > DiscountLimit && userName != 'admin') {
       alert(`Discount cannot exceed ${DiscountLimit}%`);
       // Optionally, reset the field value to the maximum allowed
       setFieldValue(`inventory.${index}.discount`, DiscountLimit);
@@ -475,6 +514,86 @@ useEffect(() => {
     //console.log("Total Amount:", totalAmount);
     }, 0);
   
+  };
+
+  //BatchField
+  const handleBatchFieldChange = (e, inventoryIndex, batchIndex, field, setFieldValue, values) => {
+    //alert('Hi');
+    // Parse the new value from the event
+    const value = parseFloat(e.target.value) || 0;
+  
+    // Update the Formik field value
+    setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.${field}`, value.toString(), false);
+  
+    // Create a copy of the current values
+    const updatedValues = { ...values };
+    updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex][field] = value;
+
+    const InvOrderNo = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].orderNo || 0;
+    //console.log(InvOrderNo);
+    setFieldValue(`inventory.${inventoryIndex}.orderNo`, InvOrderNo.value);
+  
+    // Retrieve the current values for quantity, rate, and discount
+    const quantity = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].quantity || 0;
+    const rate = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].rate || 0;
+    const discount = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].discount || 0;
+
+    setFieldValue(`inventory.${inventoryIndex}.discount`, discount);
+    updatedValues.inventory[inventoryIndex].discount = discount;
+  
+    //console.log("Batch Qty ",quantity);
+    // Calculate the amount: Quantity * Rate - Discount
+    //const amount = (quantity * rate) - discount;
+
+    // Retrieve gst_rate from the inventory entry
+  const gst_rate = updatedValues.inventory[inventoryIndex].gstrate || 0;
+  let itemnameval = updatedValues.inventory[inventoryIndex].itemName || '';
+  setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.itemname`, itemnameval.value);
+  //console.log("GST RATE : ", gst_rate);  
+  // Calculate the amount
+  const amount = calculateAmount(quantity, rate, discount);
+  setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.amount`, parseFloat(amount).toFixed(2));
+  updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].amount = amount;
+
+  // Calculate the taxable amount
+  const taxableAmount = field === 'amount' ? value : updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].amount;
+  const taxamount = (Number(gst_rate) * Number(taxableAmount)) / 100;
+  //console.log("GST AMOUNT : ", taxamount);  
+  setFieldValue(`inventory.${inventoryIndex}.taxamount`, taxamount.toFixed(2));
+  updatedValues.inventory[inventoryIndex].taxamount = taxamount.toFixed(2);
+
+  
+    // Recalculate the total amount for all batches in this inventory item
+    const totalBatchAmount = updatedValues.inventory[inventoryIndex].batchAllocations.reduce(
+      (total, batch) => total + parseFloat(batch.amount || 0),
+      0
+    );
+  
+    // Update the total amount for this inventory item
+    setFieldValue(`inventory.${inventoryIndex}.amount`, parseFloat(totalBatchAmount).toFixed(2));
+    updatedValues.inventory[inventoryIndex].amount = totalBatchAmount;
+    // Recalculate the grand total including ledger entries
+    
+    setTimeout(() => {
+    
+      const updatedLedgerEntries = updateLedgerEntries(values, setFieldValue);
+      const totalinvAmount = calculateInventoryTotal(updatedValues.inventory);
+            
+    const totalLedgerEntriesAmount = calculateLedgerEntryTotal(updatedLedgerEntries);
+    //console.log("Inv Total: ", totalinvAmount);
+    //console.log("Led Total: ", totalLedgerEntriesAmount);
+    
+    const totalAmount = totalinvAmount + totalLedgerEntriesAmount;
+
+    setFieldValue('totalAmount', parseFloat(totalAmount).toFixed(2));
+    
+    //console.log("ledger entries total:", totalLedgerEntriesAmount);
+
+    // Debugging output
+    //console.log("Updated Values:", updatedValues);
+    //console.log("Total Ledger Entries Amount:", totalLedgerEntriesAmount);
+    //console.log("Total Amount:", totalAmount);
+    }, 0);
   };
 
   const calculateInventoryTotal = (inventory) => {
@@ -542,47 +661,34 @@ useEffect(() => {
     }
   };
 
-  // Fetch voucher number on mount
-  useEffect(() => {
-    const fetchVoucherNumberOnMount = async () => {
-      const fetchedNumber = await fetchVoucherNumber();
-      setNextNumber(fetchedNumber || '0000');
-    };
-    fetchVoucherNumberOnMount();
-  }, []);
-
-  // Show modal
-  const showModal = () => {
-    setIsModalVisible(true);
-  };
-
-  // Handle modal OK
-  const handleOk = (setFieldValue) => {
-    if (autoGenerate) {
-      setFieldValue('voucherNumber', `${prefix}${nextNumber}`);
-    } else {
-      setFieldValue('voucherNumber', manualNumber);
-    }
-    setIsModalVisible(false);
-  };
-
-  // Handle modal cancel
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
-
-  // Handle auto-generate change
-  const handleAutoGenerateChange = async (e) => {
-    const isAuto = e.target.value === 'auto';
-    setAutoGenerate(isAuto);
-    if (isAuto) {
-      const fetchedNumber = await fetchVoucherNumber();
-      setNextNumber(fetchedNumber || '0000');
-    } else {
-      setNextNumber('0000');
+  const fetchVoucherNumber = async () => {
+    try {
+      handleSetupDatabase();
+      const response = await axios.get('http://localhost:5000/api/sales_vouchers/last', {
+        params: { companyName }
+      });
+      const lastVoucherNumber = response.data.vouchernumber;
+      const currvchno = (Number(lastVoucherNumber) + Number(1));
+      return (currvchno).toString();
+    } catch (error) {
+      console.error('Failed to fetch the voucher number:', error);
+      return '';
     }
   };
 
+  return (
+    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+      {({ values, setFieldValue, resetForm }) => {
+        useEffect(() => {
+          const fetchVoucherNumberOnMount = async () => {
+            const newVoucherNumber = await fetchVoucherNumber();
+            if(newVoucherNumber!='NaN')
+             setFieldValue('voucherNumber', newVoucherNumber);
+            else
+             setFieldValue('voucherNumber', 1);
+          };
+          fetchVoucherNumberOnMount();
+        }, [companyName, setFieldValue]);
 
   return (
     <Formik
@@ -653,268 +759,217 @@ useEffect(() => {
                 </Button>
               </div>
             </div>
-          </Col>
-                 
-              <Row gutter={16}>
-                <Col span={12}>
-                  <div className="form-sections">
-                    <div className="form-row">
-                      <label>Party A/c Name:</label>
-                      <Select
-                        options={supplierOptions}
-                        onChange={(option) => handleSupplierChange(option, setFieldValue)}
-                        className="field-input"
-                        loading={loading}
-                      />
-                    </div>
-                  </div>
-                </Col>
-  
-                <Col span={12}>
-                  <div className="form-sections">
-                    <div className="form-row">
-                      <label>Salesman Name:</label>
-                      <Select
-                        options={Salesmanoptions}
-                        onChange={(option) => setFieldValue('salesLedger', option ? option.value : '')}
-                        className="field-input"
-                        loading={loading}
-                      />
-                    </div>
-                  </div>
-                </Col>
-              </Row>
-  
-              <div className="form-sections">
-                <div className="form-row">
-                  <h3>Inventory Details</h3>
-                </div>
-                <table className="inventory-table">
-                  <thead>
-                    <tr>
-                      <th className="item-name-col">Item Name</th>
-                      <th>Quantity</th>
-                      <th style={{ width: '15%' }}>Rate</th>
-                      <th>Discount (%)</th>
-                      <th>Amount</th>
-                      <th>GstRate</th>
-                      <th>Tax Amount</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <FieldArray name="inventory">
-                    {({ push, remove }) => (
-                      <tbody>
-                        {values.inventory.map((item, index) => (
-                          <tr key={index}>
-                            <td>
-                              <Select
-                                options={inventoryOptions}
-                                onChange={(option) => handleItemChange(option, index, setFieldValue, values)}
-                                className="field-input"
-                                loading={loadingProducts}
-                                value={item.itemName}
-                              />
-                              <Field name={`inventory.${index}.productId`} type="hidden" />
-                            </td>
-                            <td>
-                              <Field
-                                name={`inventory.${index}.quantity`}
-                                type="number"
-                                className="field-input"
-                                onChange={(e) => handleFieldChange(e, index, 'quantity', setFieldValue, values)}
-                              />
-                            </td>
-                            <td>
-                              <Field
-                                name={`inventory.${index}.rate`}
-                                type="number"
-                                className="field-input"
-                                onChange={(e) => handleFieldChange(e, index, 'rate', setFieldValue, values)}
-                              />
-                            </td>
-                            <td>
-                              <Field
-                                name={`inventory.${index}.discount`}
-                                type="number"
-                                className="field-input"
-                                onChange={(e) => handleFieldChange(e, index, 'discount', setFieldValue, values)}
-                              />
-                            </td>
-                            <td>
-                              <Field
-                                name={`inventory.${index}.amount`}
-                                type="text"
-                                readOnly
-                                className="field-input"
-                                value={item.amount.toString()}
-                              />
-                            </td>
-                            <td>
-                              <Field
-                                name={`inventory.${index}.gstrate`}
-                                type="number"
-                                readOnly
-                                className="field-input"
-                              />
-                            </td>
-                            <td>
-                              <Field
-                                name={`inventory.${index}.taxamount`}
-                                type="text"
-                                readOnly
-                                className="field-input"
-                              />
-                            </td>
-                            <td>
-                              <Button
-                                type="danger"
-                                icon={<DeleteOutlined />}
-                                onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                        <tr>
-                          <td colSpan="8">
-                            <Button type="dashed" onClick={() => handleAddItem(push)}>
-                              Add Item
-                            </Button>
+
+            <div className="form-sections">
+              <div className="form-row">
+                <label>Party A/c Name:</label>
+                <Select
+                  options={supplierOptions}
+                  onChange={(option) => handleSupplierChange(option, setFieldValue)}
+                  className="field-input"
+                  isLoading={loading}
+                />
+                <label>Salesman Name:</label>
+                <Select
+                  options={Salesmanoptions}
+                  onChange={(option) => setFieldValue('salesLedger', option ? option.value : '')}
+                  className="field-input"
+                  isLoading={loading}
+                />
+              </div>
+            </div>
+
+
+
+            <div className="form-sections">
+              <div className="form-row">
+                <h3>Inventory Details</h3>
+              </div>
+              <table className="inventory-table">
+                <thead>
+                  <tr>
+                    <th className="item-name-col">Item Name</th>
+                    <th>Quantity</th>
+                    <th>Rate</th>
+                    <th>Discount (%)</th>
+                    <th>Amount</th>
+                    <th>GstRate</th>
+                    <th>Tax Amount</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <FieldArray name="inventory">
+                  {({ push, remove }) => (
+                    <tbody>
+                      {values.inventory.map((item, index) => (
+                        <tr key={index}>
+
+                          <td>
+                            <Select
+                              options={inventoryOptions}
+                              onChange={(option) => handleItemChange(option, index, setFieldValue, values)}
+                              className="field-input"
+                              isLoading={loadingProducts}
+                              value={item.itemName}
+                            />
+                            <Field
+                              name={`inventory.${index}.productId`}
+                              type="hidden"
+                            />
+                          </td>
+                          <td>
+                            <Field
+                              name={`inventory.${index}.quantity`}
+                              type="number"
+                              className="field-input"
+                              onChange={(e) => handleFieldChange(e, index, 'quantity', setFieldValue, values)}
+                            />
+                          </td>
+                          <td>
+                            <Field
+                              name={`inventory.${index}.rate`}
+                              type="number"
+                              className="field-input"
+                              onChange={(e) => handleFieldChange(e, index, 'rate', setFieldValue, values)}
+                            />
+                          </td>
+                          <td>
+                            <Field
+                              name={`inventory.${index}.discount`}
+                              type="number"
+                              className="field-input"
+                              onChange={(e) => handleFieldChange(e, index, 'discount', setFieldValue, values)}
+                            />
+                          </td>
+                          <td>
+                            <Field
+                              name={`inventory.${index}.amount`}
+                              type="text"
+                              readOnly
+                              className="field-input"
+                              value={item.amount.toString()}
+                            />
+                          </td>
+                          <td>
+                            <Field
+                              name={`inventory.${index}.gstrate`}
+                              type="number"
+                              readOnly
+                              className="field-input"
+                              
+                            />
+                          </td>
+                          <td>
+                            <Field
+                              name={`inventory.${index}.taxamount`}
+                              type="text"
+                              readOnly
+                              className="field-input"
+                            />
+                          </td>
+                          <td>
+                            <Button
+                              type="danger"
+                              icon={<DeleteOutlined />}
+                              onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
+                            />
                           </td>
                         </tr>
-                      </tbody>
-                    )}
-                  </FieldArray>
-                </table>
-              </div>
-  
-              <div className="ledger-entry-section">
-                <div className="legend">
-                  <h5>Ledger Entries</h5>
-                </div>
-                <FieldArray name="ledgerEntries">
-                  {({ insert, remove, push }) => (
-                    <div>
-                      <table className="ledgerentries-table">
-                        <thead>
-                          <tr>
-                            <th style={{ width: '40%' }}>Particulars</th>
-                            <th style={{ width: '20%' }}>Rate%</th>
-                            <th style={{ width: '30%' }}>Amount</th>
-                            <th style={{ width: '5%' }}>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {values.ledgerEntries.map((entry, index) => (
-                            <tr key={index}>
-                              <td>
-                                <Select
-                                  name={`ledgerEntries.${index}.particulars`}
-                                  placeholder="Particulars"
-                                  options={ledgerOptions}
-                                  onChange={(option) => handleLedgerChange(option, index, setFieldValue, values)}
-                                  value={values.ledgerEntries[index].particulars}
-                                  className="table-input field-input"
-                                />
-                              </td>
-                              <td>
-                                <Field
-                                  name={`ledgerEntries.${index}.rate`}
-                                  placeholder="Rate"
-                                  type="number"
-                                  className="table-input field-input"
-                                  onChange={(e) => handleledFieldChange(e, index, 'rate', setFieldValue, values)}
-                                />
-                              </td>
-                              <td>
-                                <Field
-                                  name={`ledgerEntries.${index}.amount`}
-                                  placeholder="Amount"
-                                  type="number"
-                                  value={values.ledgerEntries[index].amount}
-                                  className="table-input field-input"
-                                />
-                              </td>
-                              <td>
-                                <Button
-                                  type="danger"
-                                  icon={<DeleteOutlined />}
-                                  onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
-                                />
-                              </td>
-                            </tr>
-                          ))}
-                          <tr>
-                            <td colSpan="4">
-                              <Button type="dashed" onClick={() => push({ particulars: '', rate: 0, amount: 0 })}>
-                                Add Entry
-                              </Button>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
+                      ))}
+                      <tr>
+                        <td colSpan="8">
+                          <Button type="dashed" onClick={() => handleAddItem(push)}>
+                            Add Item
+                          </Button>
+                        </td>
+                      </tr>
+                    </tbody>
                   )}
                 </FieldArray>
-              </div>
-  
-              <div className="form-section">
-                <div className="form-row">
-                  <label htmlFor="options">Payment Type:</label>
-                  <Field name="Payment_Type" as="select" className="field-input">
-                    <option value="">Not Applicable</option>
-                    <option value="Cards">Cards</option>
-                    <option value="IMPS">IMPS</option>
-                    <option value="UPI">UPI</option>
-                    <option value="Cash">Cash</option>
-                  </Field>
-                </div>
-              </div>
-  
-              <div className="form-section">
-                <div className="form-row">
-                  <label>Narration:</label>
-                  <Field name="narration" as="textarea" className="field-input" />
-                </div>
-              </div>
-  
-              <Col span={13}> 
-                <div className="form-row">
-                  <label>Total Amount:</label>
-                  <Field name="totalAmount" type="text" readOnly className="field-input" value={values.totalAmount.toString()} />
-                </div>
-              </Col>
-  
-              
-          {/* Modal Component */}
-        <Modal
-          title="Configure Sales Order Preferences"
-          visible={isModalVisible}
-          onOk={() => handleOk(setFieldValue)}
-          onCancel={handleCancel}
-        >
-          <p>Your sales numbers are set on auto-generate mode to save your time. Are you sure about changing this setting?</p>
-          <Radio.Group onChange={handleAutoGenerateChange} value={autoGenerate ? 'auto' : 'manual'}>
-            <Radio value="auto">Continue auto-generating sales numbers</Radio>
-            <Radio value="manual">Enter sales numbers manually</Radio>
-          </Radio.Group>
+              </table>
+            </div>
 
-          {autoGenerate ? (
-            <div style={{ marginTop: 16 }}>
-              <label style={{ display: 'block' }}>Prefix:</label>
-              <Input
-                value={prefix}
-                onChange={(e) => setPrefix(e.target.value)}
-                placeholder="Enter prefix"
-              />
-              <label style={{ display: 'block', marginTop: 16 }}>Next Number:</label>
-              <Input
-                type="number"
-                value={nextNumber}
-                onChange={(e) => setNextNumber(e.target.value)}
-                placeholder="Enter next number"
-                disabled={autoGenerate} // Disable input if auto-generating
-              />
+            <div className="ledger-entry-section">
+          <div className="legend">
+              <h5>Ledger Entries</h5>
+            </div>
+            <FieldArray name="ledgerEntries">
+              {({ insert, remove, push }) => (
+                <div>
+                  <table className="ledgerentries-table">
+                    <thead>
+                      <tr>
+                        <th style={{ width: '40%' }}>Particulars</th>
+                        <th style={{ width: '20%' }}>Rate%</th>
+                        <th style={{ width: '30%' }}>Amount</th>
+                        <th style={{ width: '5%' }}>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {values.ledgerEntries.map((entry, index) => (
+                        <tr key={index}>
+                          <td>
+                            <Select
+                              name={`ledgerEntries.${index}.particulars`}
+                              placeholder="Particulars"
+                              options={ledgerOptions}
+                              onChange={(option) => handleLedgerChange(option, index, setFieldValue, values)}
+                              value={values.ledgerEntries[index].particulars}
+                              className="table-input field-input"
+                            />
+                          </td>
+                          <td>
+                          <Field
+                              name={`ledgerEntries.${index}.rate`}
+                              placeholder="Rate"
+                              type="number"
+                              className="table-input field-input"
+                              onChange={(e) => handleledFieldChange(e, index, 'rate', setFieldValue, values)}
+                            />
+                          </td>
+                          <td>
+                          <Field
+                              name={`ledgerEntries.${index}.amount`}
+                              placeholder="Amount"
+                              type="number"
+                              value={values.ledgerEntries[index].amount}
+                              className="table-input field-input"
+                              
+                            />
+                          </td>
+                          <td>
+                          <Button
+                              type="danger"
+                              icon={<DeleteOutlined />}
+                              onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                      <tr>
+                        <td colSpan="4">
+                          <Button type="dashed" onClick={() => push({ particulars: '', rate: 0, amount: 0 })}>
+                            Add Entry
+                          </Button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                </div>
+              )}
+            </FieldArray>
+          </div>
+
+            <div className="form-section">
+              <div className="form-row">
+                <label>Narration:</label>
+                <Field name="narration" as="textarea" className="field-input" />
+              </div>
+              <div className="form-row">
+                <label>Total Amount:</label>
+                <Field name="totalAmount" type="text" readOnly className="field-input" value={values.totalAmount.toString()} />
+              </div>
             </div>
           ) : (
             <div style={{ marginTop: 16 }}>

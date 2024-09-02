@@ -4,6 +4,7 @@ import { Form, Input, Button, Select, Divider,message } from 'antd';
 import { createGodown, fetchGodown } from '../../utils/RestApi'; // Assuming correct import path
 import { AppContext } from '../../../Context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import {BASE_URL} from '../../utils/Ipurl';
 
 const { Option } = Select;
 
@@ -57,7 +58,7 @@ if(companyName)
 const onFinish = async (values) => {
     setLoading(true);
     try {
-        const response = await axios.post('http://localhost:5000/api/create-Godown', {
+        const response = await axios.post(BASE_URL+'/create-Godown', {
           ...values,
           companyName: companyName,
         });

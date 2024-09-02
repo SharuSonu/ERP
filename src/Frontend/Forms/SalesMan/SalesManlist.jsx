@@ -7,8 +7,6 @@ import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider,
 //import { Table, Form, Button, Modal, Switch } from 'antd';
 //import '../../../styles/GroupList.css';
 import { Message } from 'semantic-ui-react';
-import '../../../styles/Formliststyle/Commonform.css';
-import '../../../styles/Formliststyle/Tableform.css';
 
 const { Option } = Select;
 
@@ -45,7 +43,7 @@ const SalesmanList = ({ onSelectSalesman }) => {
     const fetchSalesman = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/SalesmanList', {
+        const response = await axios.get(BASE_URL+'/SalesmanList', {
           params: {
             companyName:companyName,
             page:currentPage,
@@ -91,7 +89,7 @@ const SalesmanList = ({ onSelectSalesman }) => {
 useEffect(() => {
     const fetchSalesmanFromDatabase = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/Salesman_edit/${editSalesmanId}`, {
+        const response = await axios.get(BASE_URL+`/Salesman_edit/${editSalesmanId}`, {
           params: {
             companyName: companyName,
           }
@@ -238,7 +236,7 @@ useEffect(() => {
   //Modal Submit
   const handleSubmitEdit = async() => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/update-Salesman`, {
+      const response = await axios.put(BASE_URL+`/update-Salesman`, {
         SalesManName: SalesManName,       // Assuming groupName, groupAlias, and parentGroup are defined states
         SalesManNumber: SalesManNumber,
         SalesManEmailId: SalesManEmailId,
@@ -302,7 +300,7 @@ useEffect(() => {
 
  const refreshSalesmanList = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/SalesmanList', {
+      const response = await axios.get(BASE_URL+'/SalesmanList', {
         params: {
           companyName: companyName,
           page: currentPage,

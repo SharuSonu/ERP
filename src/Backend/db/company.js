@@ -199,6 +199,7 @@ router.post('/create-db', async (req, res) => {
                 KEY (ledgerId)
               )`);
 
+
               //Stock Summary      
               await connection.query(`
                 CREATE TABLE IF NOT EXISTS stock_summary (
@@ -251,6 +252,55 @@ router.post('/create-db', async (req, res) => {
              Namegroup varchar(255) DEFAULT NULL
            )`);
 
+            //RcptNote
+           await connection.query(`CREATE TABLE rcptnote_vouchers (
+            id int NOT NULL AUTO_INCREMENT,
+            voucherTypeName varchar(255) NOT NULL,
+            parentVoucherType varchar(255) DEFAULT NULL,
+            voucherDate date DEFAULT NULL,
+            partyAccount varchar(255) DEFAULT NULL,
+            purchaseLedger varchar(255) DEFAULT NULL,
+            narration text,
+            totalAmount float NOT NULL,
+            approvalStatus enum('All','Draft','Confirmed','Declined','Expired','Sent','Partially Invoiced','Accepted','Invoiced','Closed','Pending Approval','Approved','Partially Paid','Unpaid','Overdue','Payment Initiated','Paid','Rejected') DEFAULT 'Pending Approval',
+            approverId int DEFAULT NULL,
+            approvalDate datetime DEFAULT CURRENT_TIMESTAMP,
+            approvalComments text,
+            vouchernumber varchar(255) DEFAULT NULL,
+            status enum('Pending','Completed') DEFAULT 'Pending',
+            PRIMARY KEY (id)
+          )`);
+
+        
+
+          await connection.query(`CREATE TABLE rcptnote_inventory (
+            id int NOT NULL AUTO_INCREMENT,
+            voucherId int DEFAULT NULL,
+            voucherDate date DEFAULT NULL,
+            itemName varchar(255) NOT NULL,
+            quantity float NOT NULL,
+            rate float NOT NULL,
+            discount float DEFAULT '0',
+            amount float NOT NULL,
+            trackingDate date DEFAULT NULL,
+            tracking_no varchar(50) DEFAULT NULL,
+            order_no varchar(50) DEFAULT NULL,
+            orderDate date DEFAULT NULL,
+            PRIMARY KEY (id),
+            KEY voucherId (voucherId)
+          )`);
+
+          
+          await connection.query(`CREATE TABLE rcptnote_ledger_entries (
+            id int NOT NULL AUTO_INCREMENT,
+            voucherId int DEFAULT NULL,
+            particulars varchar(255) NOT NULL,
+            rate float NOT NULL,
+            amount float NOT NULL,
+            PRIMARY KEY (id),
+            KEY voucherId (voucherId)
+          )`);
+
             //purchase voucher
             await connection.query(`CREATE TABLE purchase_vouchers (
                 id int NOT NULL AUTO_INCREMENT,
@@ -268,6 +318,8 @@ router.post('/create-db', async (req, res) => {
                 vouchernumber varchar(255) DEFAULT NULL,
                 PRIMARY KEY (id)
               )`);
+
+              
                
             //purchase Inventory
             await connection.query(`CREATE TABLE purchase_inventory (
@@ -279,6 +331,10 @@ router.post('/create-db', async (req, res) => {
                 rate float NOT NULL,
                 discount float DEFAULT '0',
                 amount float NOT NULL,
+                trackingDate date DEFAULT NULL,
+                tracking_no varchar(50) DEFAULT NULL,
+                order_no varchar(50) DEFAULT NULL,
+                orderDate date DEFAULT NULL,
                 PRIMARY KEY (id),
                 KEY (voucherId)
               )`);
@@ -294,6 +350,7 @@ router.post('/create-db', async (req, res) => {
                 PRIMARY KEY (id),
                 KEY (voucherId)
               )`);
+
 
             //sales billwise
             await connection.query(`CREATE TABLE sales_bill_wise_details (
@@ -311,15 +368,40 @@ router.post('/create-db', async (req, res) => {
             await connection.query(`CREATE TABLE sales_inventory (
                 id int NOT NULL AUTO_INCREMENT,
                 voucherId int DEFAULT NULL,
+                voucherDate date DEFAULT NULL,
                 itemName varchar(255) NOT NULL,
                 quantity int NOT NULL,
                 rate float NOT NULL,
                 discount float NOT NULL,
                 amount float NOT NULL,
+                trackingDate date DEFAULT NULL,
+                tracking_no varchar(50) DEFAULT NULL,
+                order_no varchar(50) DEFAULT NULL,
+                orderDate date DEFAULT NULL,
                 PRIMARY KEY (id),
                 KEY (voucherId)
               )`);
              
+              await connection.query(`CREATE TABLE sales_batchdetails (
+                id bigint unsigned NOT NULL AUTO_INCREMENT,
+                voucherId int DEFAULT NULL,
+                voucherDate date DEFAULT NULL,
+                tracking_no varchar(50) DEFAULT NULL,
+                order_no varchar(50) DEFAULT NULL,
+                itemname varchar(50) DEFAULT NULL,
+                godown varchar(50) DEFAULT NULL,
+                batch varchar(50) DEFAULT NULL,
+                quantity float DEFAULT NULL,
+                rate float DEFAULT NULL,
+                discount float DEFAULT '0',
+                amount float DEFAULT NULL,
+                trackingDate date DEFAULT NULL,
+                invId varchar(50) DEFAULT NULL,
+                orderDate date DEFAULT NULL,
+                PRIMARY KEY (id),
+                UNIQUE KEY id (id)
+              )`);  
+
 
             //sales ledger entries
             await connection.query(`CREATE TABLE sales_ledger_entries (
@@ -491,8 +573,10 @@ router.post('/create-db', async (req, res) => {
                 approvalDate datetime DEFAULT CURRENT_TIMESTAMP,
                 approvalComments text,
                 vouchernumber varchar(255) DEFAULT NULL,
+                status enum('Pending','Completed') DEFAULT 'Pending',
                 PRIMARY KEY (id)
               )`);
+
                
             //purcOrder Inventory
             await connection.query(`CREATE TABLE purcorder_inventory (
@@ -504,10 +588,13 @@ router.post('/create-db', async (req, res) => {
                 rate float NOT NULL,
                 discount float DEFAULT '0',
                 amount float NOT NULL,
+                trackingDate date DEFAULT NULL,
+                order_no varchar(50) DEFAULT NULL,
+                tracking_no varchar(50) DEFAULT NULL,
+                orderDate date DEFAULT NULL,
                 PRIMARY KEY (id),
                 KEY (voucherId)
               )`);
-
 
                //purcorder ledger entries
             await connection.query(`CREATE TABLE purcorder_ledger_entries (
@@ -520,8 +607,111 @@ router.post('/create-db', async (req, res) => {
                 KEY (voucherId)
               )`);      
 
+             
+              //encryped_company logo
+              await connection.query(`CREATE TABLE encrypted_files (
+                id int NOT NULL AUTO_INCREMENT,
+                original_name varchar(255) NOT NULL,
+                mime_type varchar(100) NOT NULL,
+                encrypted_content text NOT NULL,
+                PRIMARY KEY (id)
+              )`); 
 
-               
+             //   purchase_batchdetails
+        await connection.query(`CREATE TABLE purchase_batchdetails (
+   id bigint unsigned NOT NULL AUTO_INCREMENT,
+   voucherId int DEFAULT NULL,
+   voucherDate date DEFAULT NULL,
+   tracking_no varchar(50) DEFAULT NULL,
+   order_no varchar(50) DEFAULT NULL,
+   itemname varchar(50) DEFAULT NULL,
+   godown varchar(50) DEFAULT NULL,
+   batch varchar(50) DEFAULT NULL,
+   quantity float DEFAULT NULL,
+   rate float DEFAULT NULL,
+   discount float DEFAULT '0',
+   amount float DEFAULT NULL,
+   trackingDate date DEFAULT NULL,
+   invId varchar(50) DEFAULT NULL,
+   orderDate date DEFAULT NULL,
+   PRIMARY KEY (id),
+   UNIQUE KEY id (id)
+ )`);
+
+
+        //purchorder_batchdetails
+        await connection.query(`CREATE TABLE purchorder_batchdetails (
+            id bigint unsigned NOT NULL AUTO_INCREMENT,
+            voucherId int DEFAULT NULL,
+            voucherDate date DEFAULT NULL,
+            order_no varchar(50) DEFAULT NULL,
+            itemname varchar(50) DEFAULT NULL,
+            godown varchar(50) DEFAULT NULL,
+            batch varchar(50) DEFAULT NULL,
+            quantity float DEFAULT NULL,
+            rate float DEFAULT NULL,
+            discount float DEFAULT '0',
+            amount float DEFAULT NULL,
+            invId int DEFAULT NULL,
+            trackingDate date DEFAULT NULL,
+            tracking_no varchar(50) DEFAULT NULL,
+            orderDate date DEFAULT NULL,
+            PRIMARY KEY (id),
+            UNIQUE KEY id (id)
+          )`);
+
+         //rcptnote_batchdetails
+         await connection.query(`CREATE TABLE rcptnote_batchdetails (
+            id bigint unsigned NOT NULL AUTO_INCREMENT,
+            voucherId int DEFAULT NULL,
+            voucherDate date DEFAULT NULL,
+            tracking_no varchar(50) DEFAULT NULL,
+            order_no varchar(50) DEFAULT NULL,
+            itemname varchar(50) DEFAULT NULL,
+            godown varchar(50) DEFAULT NULL,
+            batch varchar(50) DEFAULT NULL,
+            quantity float DEFAULT NULL,
+            rate float DEFAULT NULL,
+            discount float DEFAULT '0',
+            amount float DEFAULT NULL,
+            trackingDate date DEFAULT NULL,
+            invId varchar(50) DEFAULT NULL,
+            orderDate date DEFAULT NULL,
+            PRIMARY KEY (id),
+            UNIQUE KEY id (id)
+          )`);
+
+
+          await connection.query(`CREATE TABLE productdiscounts (
+            id int NOT NULL AUTO_INCREMENT,
+            productId int DEFAULT NULL,
+            discount decimal(15,2) DEFAULT NULL,
+            applicableDate date DEFAULT NULL,
+            userName varchar(255) DEFAULT NULL,
+            thresholdValue int DEFAULT NULL,
+            org_id int DEFAULT NULL,
+            PRIMARY KEY (id)
+          )`); 
+
+          await connection.query(`CREATE TABLE product_cost_price (
+            id int NOT NULL AUTO_INCREMENT,
+            productId int DEFAULT NULL,
+            costPrice decimal(15,2) DEFAULT NULL,
+            applicableDate date DEFAULT NULL,
+            org_id int DEFAULT NULL,
+            PRIMARY KEY (id)
+          )`); 
+
+          await connection.query(`CREATE TABLE product_selling_price (
+            id int NOT NULL AUTO_INCREMENT,
+            productId int DEFAULT NULL,
+            sellingPrices decimal(15,2) DEFAULT NULL,
+            applicableDate date DEFAULT NULL,
+            userName varchar(255) DEFAULT NULL,
+            org_id int DEFAULT NULL,
+            PRIMARY KEY (id)
+          )`);
+
               
         // Hash the default admin password using bcryptjs
         const hashedPassword = await bcrypt.hash('12345', 10);

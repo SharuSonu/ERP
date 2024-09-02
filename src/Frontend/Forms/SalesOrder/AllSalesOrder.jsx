@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Select, Checkbox, Table } from 'antd';
 import { CloseOutlined } from '@ant-design/icons';
+import {BASE_URL} from '../../utils/Ipurl';
 
 const { Option } = Select;
 

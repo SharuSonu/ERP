@@ -1,13 +1,15 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Select from 'react-select';
-import { Formik, Form, Field, FieldArray } from 'formik';
-import { Button, Divider } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
-import '../../../styles/Purchase/PurchaseForm.css';
+import { Formik, Field, Form, FieldArray, useFormikContext } from 'formik';
+import { Modal, Input,  Button, Divider, Table, DatePicker, Space, message, Form as AntForm } from 'antd';
+import { DeleteOutlined, MinusCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import '../../../styles/ReceiptNote/ReceiptNoteForm.css';
 import { createPurchaseVoucher } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import axios from 'axios';
-
+import {BASE_URL} from '../../utils/Ipurl';
+import moment from 'moment';
+import POOrderModal from './POOrderModal';
 const taxRates = {
   CGST: 9,
   SGST: 9,
@@ -46,18 +48,124 @@ const PurchaseForm = () => {
   const [supplierOptions, setSupplierOptions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [inventoryOptions, setInventoryOptions] = useState([]);
+  const [isBatchModalVisible, setIsBatchModalVisible] = useState(false);
+  const [currentInventoryIndex, setCurrentInventoryIndex] = useState(null);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [gstRate, setGstRate] = useState('');
   const [productId, setProductId] = useState(0);
   const [ledgerOptions, setLedgerOptions] = useState([]);
   const [taxInfo, setTaxInfo] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [orders, setOrders] = useState([]);
+  //const [form] = Form.useForm();
+  const [orderNumbers, setOrderNumbers] = useState([]);
+  const [selectedItemIndex, setSelectedItemIndex] = useState(null);
+  const [selectedItemName, setSelectedItemName] = useState('');
+  const [orderData, setOrderData] = useState([]);
+  const [partyName, setPartyName] = useState('');
+  const [vchnumval, setvchnumval] = useState('');
+
+  const [formValues, setFormValues] = useState(null);
+  const [formOrders, setFormOrders] = useState([]);
+
+  const handleFormValues = (values) => {
+    //setFormValues(values);
+    //console.log('Order Form Values:', values); // Do something with the form values
+    //setFormOrders(values);
+    //console.log(formOrders);
+  
+    const { trackingNos, orders } = values;
+
+  setFormOrders({
+    trackingNos: trackingNos || [],
+    orders: orders || []
+  });
+  //console.log(formOrders.orders);
+  };
+  
+
+  const [orderOptions, setOrderOptions] = useState([
+    { value: 'NotApplicable', label: 'NotApplicable' },
+    { value: 'EndofList', label: 'EndofList' }
+  ]);
+  const [trackingOptions, setTrackingOptions] = useState([
+    { value: 'NotApplicable', label: 'NotApplicable' },
+    { value: 'EndofList', label: 'EndofList' }
+  ]);
+
+  const [GodownOptions, setGodownOptions] = useState([
+    { value: 'Main Location', label: 'Main Location' }
+  ]);
+
+  const [batchOptions, setBatchOptions] = useState([
+    { value: 'Primary', label: 'Primary' }
+  ]);
+
+ 
+
+  // Fetch options for OrderNo and TrackingNo (simulate fetching from an API)
+  useEffect(() => {
+    // Simulate API calls to fetch data
+    const fetchOptions = async () => {
+      // Replace with your actual API calls
+      //const fetchedOrders = await fetch('/api/orders').then(res => res.json());
+      //const fetchedTrackings = await fetch('/api/trackings').then(res => res.json());
+     /* 
+      setOrderOptions(prevOptions => [
+        ...prevOptions,
+        ...fetchedOrders.map(order => ({ value: order.id, label: order.name }))
+      ]);*/
+      
+      setTrackingOptions(prevOptions =>[
+        ...prevOptions
+      ]);
+
+
+      setGodownOptions(prevOptions =>[
+        ...prevOptions
+        //...fetchedTrackings.map(tracking => ({ value: Godown.id, label: Godown.name }))
+      ]);
+    };
+
+    fetchOptions();
+  }, []);
 
   
+  const handleShowBatchModal = (index) => {
+    setCurrentInventoryIndex(index);
+    setIsBatchModalVisible(true);
+  };
+
+  const handleBatchModalOk = (index, setFieldValue, values) => {
+    const batchAllocations = values.inventory[index].batchAllocations;
+
+    // Sum up quantities, rates, and amounts from batch allocations
+    const totalQuantity = batchAllocations.reduce((acc, curr) => acc + parseFloat(curr.quantity || 0), 0);
+    const totalAmount = batchAllocations.reduce((acc, curr) => acc + parseFloat(curr.amount || 0), 0);
+
+    // Calculate the rate based on the total amount and total quantity
+    //const rate = totalQuantity > 0 ? totalAmount / totalQuantity : 0;
+    const rate = batchAllocations.length > 0 ? parseFloat(batchAllocations[0].rate || 0) : 0;
+    
+    // Update inventory fields
+    setFieldValue(`inventory.${index}.quantity`, totalQuantity);
+    setFieldValue(`inventory.${index}.rate`, rate.toFixed(2));
+    setFieldValue(`inventory.${index}.amount`, totalAmount.toFixed(2));
+
+    // Close the modal
+    setIsBatchModalVisible(false);
+  };
+
+  const handleBatchModalCancel = () => {
+    setIsBatchModalVisible(false);
+  };
+
+
   const handleSetupDatabase = async () => {
     setLoading(true);
 
     try {
-      await axios.post('http://localhost:5000/api/setup-database', { cmp: companyName});
+      await axios.post(BASE_URL+'/setup-database', { cmp: companyName});
       message.success('Database setup completed successfully');
     } catch (error) {
       console.error('Error setting up database:', error);
@@ -79,7 +187,7 @@ const PurchaseForm = () => {
     const fetchSuppliers = async () => {
       setLoading(true); 
       try {
-        const response = await axios.get('http://localhost:5000/api/ledgers', {
+        const response = await axios.get(BASE_URL+'/ledgers', {
           params: { companyName }
         });
         const options = response.data.map(ledger => ({
@@ -97,7 +205,7 @@ const PurchaseForm = () => {
     const fetchProducts = async () => {
       setLoadingProducts(true); 
       try {
-        const response = await axios.get('http://localhost:5000/api/products', {
+        const response = await axios.get(BASE_URL+'/products', {
           params: { companyName }
         });
         const options = response.data.map(product => ({
@@ -118,12 +226,15 @@ const PurchaseForm = () => {
 
   const handleSupplierChange = (option, setFieldValue) => {
     setFieldValue('supplier', option);
+    fetchPendingGRN(option.value);
+    fetchOrderNumbers(option.value);
+    setPartyName(option.value);
   };
 
   useEffect(() => {
     const fetchTaxes = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/taxes', {
+        const response = await axios.get(BASE_URL+'/taxes', {
           params: { companyName }
         });
         const fetchedTaxInfo = response.data.map(tax => ({ taxid: tax.id, taxname : tax.taxname, taxrate : tax.taxrate, taxtype: tax.taxtype }));
@@ -143,14 +254,18 @@ const PurchaseForm = () => {
 
   const handleItemChange = async (option, index, setFieldValue, values) => {
     setFieldValue(`inventory.${index}.itemName`, option);
+    setSelectedItemIndex(index);
+    setSelectedItemName(option.label);
+    setIsBatchModalVisible(true);
+    handleShowBatchModal(index);
     try {
       
-      const response = await axios.get('http://localhost:5000/api/stockitem', {
+      const response = await axios.get(BASE_URL+'/stockitem', {
         params: { companyName, productName: option.label }
       });
       const product = response.data;
 
-      const response_gstrate = await axios.get('http://localhost:5000/api/gst-rate', {
+      const response_gstrate = await axios.get(BASE_URL+'/gst-rate', {
         params: { companyName, productId:  product[0].id }
       });
       const gstrate = response_gstrate.data;
@@ -189,7 +304,7 @@ const PurchaseForm = () => {
         params: { companyName, particulars: option.label }
       });*/
       //const ledtaxid = response.data;
-    const response_gstrate = await axios.get('http://localhost:5000/api/ledtaxrate', {
+    const response_gstrate = await axios.get(BASE_URL+'/ledtaxrate', {
       params: { companyName, particulars: option.label }
     });
     const ledtaxrate = response_gstrate.data;
@@ -372,7 +487,6 @@ const PurchaseForm = () => {
     setTimeout(() => {
     const totalinvAmount = calculateInventoryTotal(updatedValues.inventory);
     
-  
     const totalLedgerEntriesAmount = calculateLedgerEntryTotal(updatedLedgerEntries);
     const totalAmount = totalinvAmount + totalLedgerEntriesAmount;
 
@@ -386,6 +500,87 @@ const PurchaseForm = () => {
     }, 0);
   
   };
+
+  //BatchField
+  const handleBatchFieldChange = (e, inventoryIndex, batchIndex, field, setFieldValue, values) => {
+    //alert('Hi');
+    // Parse the new value from the event
+    const value = parseFloat(e.target.value) || 0;
+  
+    // Update the Formik field value
+    setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.${field}`, value.toString(), false);
+  
+    // Create a copy of the current values
+    const updatedValues = { ...values };
+    updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex][field] = value;
+
+    const InvOrderNo = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].orderNo || 0;
+    //console.log(InvOrderNo);
+    setFieldValue(`inventory.${inventoryIndex}.orderNo`, InvOrderNo.value);
+  
+    // Retrieve the current values for quantity, rate, and discount
+    const quantity = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].quantity || 0;
+    const rate = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].rate || 0;
+    const discount = updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].discount || 0;
+
+    setFieldValue(`inventory.${inventoryIndex}.discount`, discount);
+    updatedValues.inventory[inventoryIndex].discount = discount;
+  
+    //console.log("Batch Qty ",quantity);
+    // Calculate the amount: Quantity * Rate - Discount
+    //const amount = (quantity * rate) - discount;
+
+    // Retrieve gst_rate from the inventory entry
+  const gst_rate = updatedValues.inventory[inventoryIndex].gstrate || 0;
+  let itemnameval = updatedValues.inventory[inventoryIndex].itemName || '';
+  setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.itemname`, itemnameval.value);
+  //console.log("GST RATE : ", gst_rate);  
+  // Calculate the amount
+  const amount = calculateAmount(quantity, rate, discount);
+  setFieldValue(`inventory.${inventoryIndex}.batchAllocations.${batchIndex}.amount`, parseFloat(amount).toFixed(2));
+  updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].amount = amount;
+
+  // Calculate the taxable amount
+  const taxableAmount = field === 'amount' ? value : updatedValues.inventory[inventoryIndex].batchAllocations[batchIndex].amount;
+  const taxamount = (Number(gst_rate) * Number(taxableAmount)) / 100;
+  //console.log("GST AMOUNT : ", taxamount);  
+  setFieldValue(`inventory.${inventoryIndex}.taxamount`, taxamount.toFixed(2));
+  updatedValues.inventory[inventoryIndex].taxamount = taxamount.toFixed(2);
+
+  
+    // Recalculate the total amount for all batches in this inventory item
+    const totalBatchAmount = updatedValues.inventory[inventoryIndex].batchAllocations.reduce(
+      (total, batch) => total + parseFloat(batch.amount || 0),
+      0
+    );
+  
+    // Update the total amount for this inventory item
+    setFieldValue(`inventory.${inventoryIndex}.amount`, parseFloat(totalBatchAmount).toFixed(2));
+    updatedValues.inventory[inventoryIndex].amount = totalBatchAmount;
+    // Recalculate the grand total including ledger entries
+    
+    setTimeout(() => {
+    
+      const updatedLedgerEntries = updateLedgerEntries(values, setFieldValue);
+      const totalinvAmount = calculateInventoryTotal(updatedValues.inventory);
+            
+    const totalLedgerEntriesAmount = calculateLedgerEntryTotal(updatedLedgerEntries);
+    //console.log("Inv Total: ", totalinvAmount);
+    //console.log("Led Total: ", totalLedgerEntriesAmount);
+    
+    const totalAmount = totalinvAmount + totalLedgerEntriesAmount;
+
+    setFieldValue('totalAmount', parseFloat(totalAmount).toFixed(2));
+    
+    //console.log("ledger entries total:", totalLedgerEntriesAmount);
+
+    // Debugging output
+    //console.log("Updated Values:", updatedValues);
+    //console.log("Total Ledger Entries Amount:", totalLedgerEntriesAmount);
+    //console.log("Total Amount:", totalAmount);
+    }, 0);
+  };
+  
 
   const calculateInventoryTotal = (inventory) => {
     return inventory.reduce((total, item) => parseFloat(total) + parseFloat(item.amount), 0);
@@ -402,8 +597,193 @@ const PurchaseForm = () => {
     fetchVoucherNumber().then(newVoucherNumber => setFieldValue('voucherNumber', newVoucherNumber));
   };
 
+
+  const fetchOrderNumbers = async (partyAccount) => {
+    try {
+      // Ensure to pass the 'cmp' query parameter as needed
+      const response = await axios.get(`${BASE_URL}/pending-purchase-orders`, {
+        params: { cmp: companyName, partyAccount: partyAccount } 
+      });
+      const { success, pendingPOs } = response.data;
+
+      if (success && pendingPOs.length > 0) {
+        // Map the pendingPOs to the desired format
+        const fetchedOrders = response.data.pendingPOs.map(order => ({
+          value: order.vouchernumber,
+          label: `${order.vouchernumber}`, // Customize label format as needed
+          date: order.voucherDate
+        }));
+
+        
+        setOrderData(fetchedOrders);
+        // Combine existing options with new fetched orders and filter out duplicates
+        setOrderOptions(prevOptions => {
+          const existingValues = new Set(prevOptions.map(option => option.value));
+          const uniqueOrders = [
+            ...prevOptions,
+            ...fetchedOrders.filter(order => !existingValues.has(order.value))
+          ];
+
+          return uniqueOrders;
+        });
+
+        // Update the state with unique orders
+        setOrderNumbers(prevNumbers => {
+          const existingValues = new Set(prevNumbers.map(number => number.value));
+          const uniqueOrders = [
+            ...prevNumbers,
+            ...fetchedOrders.filter(order => !existingValues.has(order.value))
+          ];
+
+          return uniqueOrders;
+        });
+      } else {
+        //alert('Hi');
+        setOrderOptions([]);
+        setOrderNumbers([]);
+        setOrderOptions([
+          { value: 'NotApplicable', label: 'NotApplicable' },
+          { value: 'EndofList', label: 'EndofList' }
+      ]);
+        //console.log('Failed to fetch orders');
+        //message.error('Failed to fetch orders');
+      }
+
+    } catch (error) {
+      message.error('Failed to fetch order numbers');
+    }
+  };
+
+  //Fetching Tracking No(GRN)
+  const fetchPendingGRN = async (partyAccount) => {
+    try {
+      // Ensure to pass the 'cmp' query parameter as needed
+      const response = await axios.get(`${BASE_URL}/pending-GRN`, {
+        params: { cmp: companyName, partyAccount: partyAccount } 
+      });
+      const { success, pendingGRN } = response.data;
+
+      if (success && pendingGRN.length > 0) {
+        // Map the pendingGRN to the desired format
+        const fetchedTrackingNo = response.data.pendingGRN.map(grn => ({
+          value: grn.vouchernumber,
+          label: `${grn.vouchernumber}`, // Customize label format as needed
+          date: grn.voucherDate
+        }));
+
+        
+        setTrackingOptions(fetchedTrackingNo);
+        
+        // Combine existing options with new fetched GRN and filter out duplicates
+        setTrackingOptions(prevOptions => {
+          const existingValues = new Set(prevOptions.map(option => option.value));
+          const uniqueOrders = [
+            ...prevOptions,
+            ...fetchedTrackingNo.filter(grn => !existingValues.has(grn.value))
+          ];
+          //console.log(fetchedTrackingNo);
+          return uniqueOrders;
+        });
+ 
+      } else {
+        //alert('Hi');
+        setTrackingOptions([]);
+        
+        setTrackingOptions([
+          { value: 'NotApplicable', label: 'NotApplicable' },
+          { value: 'EndofList', label: 'EndofList' }
+      ]);
+        //console.log('Failed to GRN');
+        //message.error('Failed to GRN');
+      }
+
+    } catch (error) {
+      message.error('Failed to fetch GRN');
+    }
+  };
+
+  /*
+  useEffect(() => {
+    fetchOrderNumbers(); // Fetch order numbers when the component mounts
+  }, []); // Empty dependency array means this effect runs once on mount
+*/
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+
+  /*const handleOk = async () => {
+    
+    try {
+      
+      //alert('Hi');
+      //console.log('Before API Call');
+      //console.log('API Endpoint:', `${BASE_URL}/fetch-all-pending-po-details`);
+      //console.log('API Params:', { cmp: companyName, partyAccount: partyName });
+      //console.log('Reached After Params Log'); // Add this after the params log
+
+      const response = await axios.get(`${BASE_URL}/fetch-all-pending-po-details`, {
+          params: {
+              cmp: companyName, 
+              partyAccount: partyName, 
+          }
+      });
+
+      //setFieldValue(`inventory.0.rate`, 100);
+      setIsModalVisible(false);
+      
+  } catch (error) {
+      message.error(error); 
+      //message.error('Error fetching order details.');
+  }
+  }; */
+
+  // Example functions to update respective sections
+const updateInventoryEntries = (order) => {
+  // Implement the logic to update InventoryEntries based on order details
+  console.log('Updating InventoryEntries for:', order);
+};
+
+const updateBatchDetails = (order) => {
+  // Implement the logic to update Batch Details based on order details
+  console.log('Updating Batch Details for:', order);
+};
+
+const updateLegerEntries = (order) => {
+  // Implement the logic to update Leger Entries based on order details
+  console.log('Updating Leger Entries for:', order);
+};
+  
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const columns = [
+    {
+      title: 'Order Number',
+      dataIndex: 'orderNumber',
+      key: 'orderNumber',
+  
+    },
+    {
+      title: 'Order Date',
+      dataIndex: 'orderDate',
+      key: 'orderDate',
+      render: (date) => date.format('YYYY-MM-DD')
+    },
+  ];
+
+  const extractOrderNumbers = (orders) => {
+    return orders
+      .map(order => order.orderNumber)
+      .filter(Boolean)
+      .join(',');
+  };
+
   const handleSubmit = async (values, actions) => {
-    console.log('Form Values:', values);
+    //console.log('Form Values:', values);
     
     const voucherData = {
       ...values,
@@ -413,16 +793,63 @@ const PurchaseForm = () => {
     };
     try {
       
-      const response = await createPurchaseVoucher(voucherData);
-
+       // Validate and get form values
+       //const values = await AntForm.validateFields();
+       // Extract multiple order numbers as a comma-separated string
+       //const orderNumbers = values.orders.map(order => order.orderNumber).filter(Boolean).join(',');
+       
+       const orderNumbers = extractOrderNumbers(formOrders.orders);
+       if (!orderNumbers) {
+        alert('No order numbers found!');
+        return;
+       }
+       const response = await createPurchaseVoucher(voucherData);
+    
       if (response.success) {
+        //const orderNumbers = values.orders.map(order => order.orderNumber).join(',');
+        
+   /*     let orderNumbers = '';
+
+      if (values.orders && Array.isArray(values.orders) && values.orders.length > 0) {
+        orderNumbers = values.orders.map(order => order.orderNumber).join(',');   
+      } else {
+      console.error('No orders found or orders is not an array');
+      // Handle the case where there are no orders or orders is not an array
+        alert('No orders available to process.');
+      return; // Exit the function early if there are no valid orders
+        }*/
         alert('Voucher created successfully');
-        actions.resetForm({ values: initialValues });
-        const newVoucherNumber = await fetchVoucherNumber();
-        actions.setFieldValue('voucherNumber', newVoucherNumber);
+      
+        
+
+        // Call the API to check quantity matching
+        const apiResponse = await fetch(BASE_URL+`/check-PO_Purcquantity?cmp=${encodeURIComponent(companyName)}&partyAccount=${encodeURIComponent(values.supplier.value)}&orderNumbers=${encodeURIComponent(orderNumbers)}`);
+
+        const chkresult = await apiResponse.json();
+        if (chkresult.success) {
+          //alert('Purchase Order status updated successfully');
+      } else {
+          console.log('Failed to update Purchase Order status');
+          //alert('Failed to update Purchase Order status');
+      }
+
+
+        if (chkresult.success) {
+            //alert('Quantities match');
+            const updateResponse = await fetch(BASE_URL + `/update-postatus?cmp=${encodeURIComponent(companyName)}&partyAccount=${encodeURIComponent(values.supplier.value)}&orderNumbers=${encodeURIComponent(orderNumbers)}&status=Completed`);
+            const updateResult = await updateResponse.json();
+          } else {
+            //alert('Quantities do not match');
+        }
+
       } else {
         alert(response.message || 'Failed to create Voucher');
       }
+
+      actions.resetForm({ values: initialValues });
+      const newVoucherNumber = await fetchVoucherNumber();
+      actions.setFieldValue('voucherNumber', newVoucherNumber);
+
     } catch (error) {
       console.error('Error:', error);
       alert(error.message || 'An error occurred');
@@ -431,8 +858,8 @@ const PurchaseForm = () => {
 
   const fetchVoucherNumber = async () => {
     try {
-      handleSetupDatabase();
-      const response = await axios.get('http://localhost:5000/api/purchase_vouchers/last', {
+      //handleSetupDatabase();
+      const response = await axios.get(BASE_URL+'/purchase_vouchers/last', {
         params: { companyName }
       });
       const lastVoucherNumber = response.data.vouchernumber;
@@ -442,6 +869,12 @@ const PurchaseForm = () => {
       console.error('Failed to fetch the voucher number:', error);
       return '';
     }
+  };
+
+  const handleRemoveOrder = (name) => {
+    form.setFieldsValue({
+      orders: form.getFieldValue('orders').filter((_, index) => index !== name)
+    });
   };
 
   return (
@@ -491,6 +924,73 @@ const PurchaseForm = () => {
               </div>
             </div>
 
+            <>
+      <Divider><Button type="primary" onClick={showModal}>
+        Track Order
+      </Button></Divider>
+    {/*  <Modal
+        title="Order Details"
+        visible={isModalVisible}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={800}
+      >
+        <Form form={form} layout="vertical" name="orderForm">
+          <Form.List name="orders">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map(({ key, name, fieldKey, ...restField }) => (
+                  <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
+                    <Form.Item
+                      {...restField}
+                      name={[name, 'orderNumber']}
+                      fieldKey={[fieldKey, 'orderNumber']}
+                      label="Order Number"
+                      rules={[{ required: true, message: 'Please select the order number!' }]}
+                    >
+                      <Select
+                        placeholder="Select Order Number"
+                        options={orderOptions}
+                        onChange={(value) => handleOrderNumberChange(value, name)}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      {...restField}
+                      name={[name, 'orderDate']}
+                      fieldKey={[fieldKey, 'orderDate']}
+                      label="Order Date"
+                      rules={[{ required: true, message: 'Please select the order date!' }]}
+                    >
+                      <DatePicker style={{ width: '100%' }} />
+                    </Form.Item>
+                    <MinusCircleOutlined onClick={() => remove(name)} />
+                  </Space>
+                ))}
+                <Form.Item>
+                  <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                    Add Order
+                  </Button>
+                </Form.Item>
+              </>
+            )}
+          </Form.List>
+        </Form>
+      </Modal> */}
+
+    <POOrderModal
+            isModalVisible={isModalVisible}
+            setIsModalVisible={setIsModalVisible}
+            setFieldValue={setFieldValue}
+            values={values}
+            companyName={companyName}
+            partyName={partyName}
+            orderOptions={orderOptions}
+            trackingOptions={trackingOptions}
+            vchnumval={!isNaN(vchnumval) ? vchnumval : 1}
+            onFormValues={handleFormValues}
+          />
+    </>
+
             <div className="form-sections">
               <div className="form-row">
                 <h3>Inventory Details</h3>
@@ -526,6 +1026,15 @@ const PurchaseForm = () => {
                               name={`inventory.${index}.productId`}
                               type="hidden"
                             />
+
+                            <Field
+                              name={`inventory.${index}.orderNo`}
+                              type="hidden"
+                            />
+                          {/*<Button type="default" onClick={() => handleShowBatchModal(index)}>
+                            Batch Allocations
+                          </Button>
+                            */}
                           </td>
                           <td>
                             <Field
@@ -578,6 +1087,235 @@ const PurchaseForm = () => {
                             />
                           </td>
                           <td>
+                          <Modal
+                            title="Batch Details"
+                            visible={isBatchModalVisible && currentInventoryIndex === index}
+                            onOk={() => handleBatchModalOk(index, setFieldValue, values)}
+                            onCancel={handleBatchModalCancel}
+                            width={1400}
+                          >
+                            <p>Selected Item Index: {selectedItemIndex}</p>
+                            <p>Selected Item Name: {selectedItemName}</p>
+                            <FieldArray name={`inventory.${index}.batchAllocations`}>
+                              {({ push, remove }) => (
+                                <>
+                                  <Table
+                                    dataSource={values.inventory[index].batchAllocations}
+                                    columns={[
+                                      {
+                                        title: 'Tracking No',
+                                        dataIndex: 'trackingNo',
+                                        key: 'trackingNo',
+                                        width: 200,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.trackingNo`}>
+                                            {({ field, form }) => (
+                                                <Select
+                                                      {...field}
+                                                       value={field.value || undefined} // Ensure the value is controlled
+                                                      onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.trackingNo`, value)}
+                                                      options={trackingOptions}
+                                                      />
+                                                    )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Order No',
+                                        dataIndex: 'orderNo',
+                                        key: 'orderNo',
+                                        width: 200,
+                                        render: (text, record, idx) => (
+                                        
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.orderNo`}>
+                                          {({ field, form }) => (
+                                              <Select
+                                                    {...field}
+                                                     value={field.value || undefined} // Ensure the value is controlled
+                                                    onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.orderNo`, value)}
+                                                    options={orderOptions}
+                                                    />
+                                                  )}
+                                        </Field>
+
+                                        ),
+                                      },
+                                      {
+                                        title: 'itemname',
+                                        dataIndex: 'itemname',
+                                        key: 'itemname',
+                                        width: 200,
+                                        hidden: true,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.itemname`}>
+                                            {({ field, form }) => (
+                                              <input
+                                                type="text" // Ensure it's hidden if you don't want it displayed
+                                                {...field}
+                                                value={selectedItemName || ''} // Ensure the correct value is passed
+                                                onChange={(e) => {
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.itemname`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Godown',
+                                        dataIndex: 'godown',
+                                        key: 'godown',
+                                        width: 200,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.godown`}>
+                                          {({ field, form }) => (
+                                              <Select
+                                                    {...field}
+                                                     value={field.value || undefined} // Ensure the value is controlled
+                                                    onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.godown`, value)}
+                                                    options={GodownOptions}
+                                                    />
+                                                  )}
+                                        </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Batch',
+                                        dataIndex: 'batch',
+                                        key: 'batch',
+                                        width: 150,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.batch`}>
+                                          {({ field, form }) => (
+                                              <Select
+                                                    {...field}
+                                                     value={field.value || undefined} // Ensure the value is controlled
+                                                    onChange={(value) => form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.batch`, value)}
+                                                    options={batchOptions}
+                                                    />
+                                                  )}
+                                        </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Quantity',
+                                        dataIndex: 'quantity',
+                                        key: 'quantity',
+                                        width: 100,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.quantity`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'quantity', form.setFieldValue, form.values);
+                                                  // It's a good idea to explicitly call `form.setFieldValue` here if necessary
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.quantity`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Rate',
+                                        dataIndex: 'rate',
+                                        key: 'rate',
+                                        width: 130,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.rate`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'rate', form.setFieldValue, form.values);
+                                                  // Ensure Formik value is updated
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.rate`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Discount',
+                                        dataIndex: 'discount',
+                                        key: 'discount',
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.discount`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'discount', form.setFieldValue, form.values);
+                                                  // Ensure Formik value is updated
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.discount`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Amount',
+                                        dataIndex: 'amount',
+                                        key: 'amount',
+                                        width: 150,
+                                        render: (text, record, idx) => (
+                                          <Field name={`inventory.${index}.batchAllocations.${idx}.amount`}>
+                                            {({ field, form }) => (
+                                              <Input
+                                                {...field}
+                                                onChange={(e) => {
+                                                  handleBatchFieldChange(e, index, idx, 'amount', form.setFieldValue, form.values);
+                                                  // Ensure Formik value is updated
+                                                  form.setFieldValue(`inventory.${index}.batchAllocations.${idx}.amount`, e.target.value);
+                                                }}
+                                              />
+                                            )}
+                                          </Field>
+                                        ),
+                                      },
+                                      {
+                                        title: 'Action',
+                                        key: 'action',
+                                        render: (text, record, idx) => (
+                                          <Button
+                                            type="danger"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => remove(idx)}
+                                          />
+                                        ),
+                                      },
+                                    ]}
+                                    pagination={false}
+                                    rowKey={(record, idx) => idx}
+                                  />
+                                  <Button
+                                    type="dashed"
+                                    onClick={() =>
+                                      push({
+                                        itemname:'',
+                                        trackingNo: '',
+                                        orderNo: '',
+                                        godown: 'NotApplicable',
+                                        batch: '',
+                                        quantity: '',
+                                        rate: '',
+                                        discount: '',
+                                        amount: '',
+                                      })
+                                    }
+                                    block
+                                    icon={<PlusOutlined />}
+                                  >
+                                    Add Entry
+                                  </Button>
+                                </>
+                              )}
+                            </FieldArray>
+                          </Modal>
+
                             <Button
                               type="danger"
                               icon={<DeleteOutlined />}
@@ -681,12 +1419,12 @@ const PurchaseForm = () => {
                 <Field name="totalAmount" type="text" readOnly className="field-input" value={values.totalAmount.toString()} />
               </div>
             </div>
+      
 
             <div className="form-actions">
               <Button type="primary" htmlType="submit">
                 Submit
-              </Button>
-              
+              </Button>              
             </div>
             <Divider></Divider>
           </Form>

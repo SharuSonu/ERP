@@ -4,9 +4,7 @@ import PropTypes from 'prop-types';
 import { AppContext } from '../../../Context/AppContext';
 import { createGroup, fetchStockcategory } from '../../utils/RestApi';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
-//import '../../../styles/StockGroupList.css';
-import '../../../styles/Formliststyle/Commonform.css';
-import '../../../styles/Formliststyle/Tableform.css';
+import '../../../styles/StockGroupList.css';
 
 const StockCategoryList = ({ onSelectStockcategory }) => {
     const { companyName } = useContext(AppContext);
@@ -47,7 +45,7 @@ const StockCategoryList = ({ onSelectStockcategory }) => {
       setLoading(true);
 
       try {
-        const response = await axios.get('http://localhost:5000/api/stockcategorylist', {
+        const response = await axios.get(BASE_URL+'/stockcategorylist', {
           params: {
             companyName: companyName,
             page: currentPage,
@@ -97,7 +95,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchcategoryFromDatabase = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/stockcategory_edit/${editStockcategoryId}`, {
+        const response = await axios.get(BASE_URL+`/stockcategory_edit/${editStockcategoryId}`, {
           params: {
             companyName: companyName,
           }
@@ -125,7 +123,7 @@ useEffect(() => {
   useEffect(() => {
     const fetchcategoryFromDatabase = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/stockcategory_delete/${deleteStockcategoryId}`, {
+        const response = await axios.get(BASE_URL+`/stockcategory_delete/${deleteStockcategoryId}`, {
           params: {
             companyName: companyName,
           }
@@ -257,7 +255,7 @@ useEffect(() => {
    const handleSubmitEdit = async() => {
     try {
       
-      const response = await axios.put(`http://localhost:5000/api/update-stockcategory`, {
+      const response = await axios.put(BASE_URL+`/update-stockcategory`, {
         Name: stockcategoryName,       // Assuming groupName, groupAlias, and parentGroup are defined states
         Namealias: stockcategoryalias,
         Namegroup: stockcategorygroup,
@@ -285,7 +283,7 @@ useEffect(() => {
   const handleSubmitdelete = async() => {
     try {
       
-      const response = await axios.put(`http://localhost:5000/api/delete-stockcategory`, {
+      const response = await axios.put(BASE_URL+`/delete-stockcategory`, {
         Name: stockcategoryName,       // Assuming groupName, groupAlias, and parentGroup are defined states
         Namealias: stockcategoryalias,
         Namegroup: stockcategorygroup,
@@ -310,7 +308,7 @@ useEffect(() => {
 
   const refreshStockcategoryList = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/stockcategorylist', {
+        const response = await axios.get(BASE_URL+'/stockcategorylist', {
           params: {
             companyName: companyName,
             page: currentPage,

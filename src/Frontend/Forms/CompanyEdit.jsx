@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../Context/AppContext';
 import moment from 'moment'; // Import moment.js for date handling
 const { Option } = Select;
+import {BASE_URL} from '../utils/Ipurl';
 
 const CompanyEdit = ({
     onFinish,
@@ -47,7 +48,7 @@ const CompanyEdit = ({
     const fetchOrganizationDetails = async () => {
         setLoading(true);
         try {
-            const response = await fetch('http://localhost:5000/api/organization', {
+            const response = await fetch(BASE_URL+'/organization', {
                 headers: {
                     'company-name': companyName, // Replace with actual logic to get current companyName
                 },

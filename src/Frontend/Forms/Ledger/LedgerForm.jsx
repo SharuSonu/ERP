@@ -408,7 +408,6 @@ const handleOpeningBalanceChange = (e) => {
                         <Form.Item
                             label="GSTIN"
                             name="GSTIN"
-                            rules={[{ required: true, message: 'Please input GSTIN!' }]}
                         >
                             <Input />
                         </Form.Item>

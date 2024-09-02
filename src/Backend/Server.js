@@ -18,8 +18,6 @@ const salesmanroutes = require('./SalesMan/SalesMan');
 const Godown=require('./Godown/Godown');
 const Stockcategory= require('./Stock Category/Stockcategory');
 const Dashboard = require('./Dashboard/Dashboard');
-const Unitsroutes = require('./Units/Units');
-const Compoundroutes=require('./Units/Compoundunits');
 
 
 const app = express();
@@ -115,9 +113,6 @@ app.use('/api', salesmanroutes);
 app.use('/api', Godown);
 
 app.use('/api',Stockcategory);
-
-app.use('/api',Unitsroutes);
-app.use('/api',Compoundroutes);
 
 //prashanth code
 
@@ -1251,6 +1246,7 @@ app.get('/api/purcorder_voucher', async (req, res) => {
         res.status(500).json({ error: 'Error fetching data' });
     }
 });  
+
 app.get('/api/purcorder_vouchers/last', async (req, res) => {
     const { companyName } = req.query;
   
@@ -1286,6 +1282,96 @@ app.get('/api/purcorder_vouchers/last', async (req, res) => {
     }
   });
 
+app.get('/api/receiptnote_voucher', async (req, res) => {
+    const { companyName, page, limit, status } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // Calculate offset for pagination
+        const offset = (page - 1) * limit;
+
+        // SQL query to fetch records from sales_vouchers table with pagination and status filtering
+        let sql = 'SELECT SQL_CALC_FOUND_ROWS * FROM rcptnote_vouchers';
+        const params = [];
+
+        // Add WHERE clause for status filtering if provided
+        if (status && status !== 'All') {
+            sql += ' WHERE status = ?';
+            params.push(status);
+        }
+
+        sql += ' LIMIT ?, ?';
+
+        const [results] = await connection.query(sql, [...params, offset, parseInt(limit)]);
+
+        // Fetch total count of rows (excluding LIMIT)
+        const [rowCount] = await connection.query('SELECT FOUND_ROWS() AS total');
+        const totalCount = rowCount[0].total;
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Format the response with `invoices` and `totalCount` keys
+        const response = {
+            invoices: results, // Assuming `results` contains your fetched records
+            totalCount: totalCount
+        };
+
+        // Send fetched data as JSON response
+        res.json(response);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/rcptnote_vouchers/last', async (req, res) => {
+    const { companyName } = req.query;
+  
+    if (!companyName) {
+      return res.status(400).json({ error: 'Company name is required' });
+    }
+  
+    try {
+      // Generate database name based on organization name
+      const dbName = getDatabaseName(companyName);
+  
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+  
+      // Switch to the selected database
+      await connection.changeUser({ database: dbName });
+  
+    
+      const sql = 'SELECT vouchernumber FROM rcptnote_vouchers ORDER BY id DESC LIMIT 1';
+  
+      // Execute query
+      const [results] = await connection.query(sql);
+  
+      // Release the connection back to the pool
+      connection.release();
+  
+      // Send fetched data as JSON response
+      res.json(results[0]); 
+  
+    } catch (error) {
+      console.error('Error fetching last voucher number:', error);
+      res.status(500).json({ error: 'Error fetching last voucher number' });
+    }
+  });
 
 app.get('/api/stockgroups_edit/:editStockGroupId', async (req, res) => {
     const { companyName } = req.query;
@@ -1988,8 +2074,6 @@ app.get('/api/Stockgroups_delete/:deletestockgroupId', async (req, res) => {
 });
 
 
-
-
 app.get('/api/stockcategory_delete/:deleteStockcategoryId', async (req, res) => {
     const { companyName } = req.query;
 
@@ -2030,6 +2114,931 @@ app.get('/api/stockcategory_delete/:deleteStockcategoryId', async (req, res) => 
         res.status(500).json({ error: 'Error fetching data' });
     }
 });
+
+app.get('/api/purchase_voucher/:invoiceId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { invoiceId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch a specific purchase voucher based on invoiceId
+        const sql = 'SELECT * FROM purchase_vouchers WHERE vouchernumber = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [invoiceId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Purchase voucher not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+
+/** Purchase Order**/
+
+app.get('/api/purcorder_voucher/:invoiceId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { invoiceId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch a specific purchase voucher based on invoiceId
+        const sql = 'SELECT * FROM purcorder_vouchers WHERE vouchernumber = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [invoiceId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'PurchaseOrder voucher not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/purcorder_inventory', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch items from purchase_inventory along with HSN details
+        const sql = `
+            SELECT 
+                pi.itemName, 
+                pi.quantity, 
+                pi.rate, 
+                pi.discount, 
+                pi.amount,
+                si.name AS stockItemName,
+                sgd.hsn AS hsnCode,
+                sgd.gstRate AS gstRate
+            FROM 
+                purcorder_inventory pi
+            JOIN 
+                stockitem si ON pi.itemName = si.name
+            JOIN 
+                sku_gst_details sgd ON si.id = sgd.stockItemId
+            WHERE 
+                pi.voucherId = ?
+        `;
+
+        // Execute query with vouchernumber as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Items not found for this order' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/purcorder_ledger_entries', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+  
+    if (!companyName || !vouchernumber) {
+      return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+  
+    try {
+      // Generate database name based on organization name
+      const dbName = getDatabaseName(companyName);
+  
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+  
+      // Switch to the selected database
+      await connection.changeUser({ database: dbName });
+  
+      // SQL query to fetch items from sales_inventory based on voucherNumber
+      const sql = 'SELECT particulars, rate, amount FROM purcorder_ledger_entries WHERE voucherId = ?'; // Adjust query as per your schema
+  
+      // Execute query with vouchernumber as parameter
+      const [results] = await connection.query(sql, [vouchernumber]);
+  
+      // Release the connection back to the pool
+      connection.release();
+  
+      // Check if items were found
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Items not found for this order' });
+      }
+  
+      // Send fetched data as JSON response
+      res.json(results);
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Error fetching data' });
+    }
+  });
+
+app.get('/api/purcorder_hsn_tax_details', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher ID are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch HSN-wise tax details
+        const sql = `
+            SELECT 
+                HSNCode, 
+                SUM(TaxableValue) AS TaxableValue,
+                CentralTaxRate,
+                SUM(CentralTaxAmount) AS CentralTaxAmount,
+                StateTaxRate,
+                SUM(StateTaxAmount) AS StateTaxAmount,
+                SUM(TotalTaxAmount) AS TotalTaxAmount
+            FROM (
+                SELECT 
+                    sgd.hsn AS HSNCode, 
+                    pi.amount AS TaxableValue,
+                    sgd.gstRate / 2 AS CentralTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS CentralTaxAmount,
+                    sgd.gstRate / 2 AS StateTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS StateTaxAmount,
+                    pi.amount * sgd.gstRate / 100 AS TotalTaxAmount
+                FROM 
+                    purcorder_inventory pi
+                JOIN 
+                    stockitem si ON pi.itemName = si.name
+                JOIN 
+                    sku_gst_details sgd ON si.id = sgd.stockItemId
+                WHERE 
+                    pi.voucherId = ?
+            ) AS subquery
+            GROUP BY 
+                HSNCode, CentralTaxRate, StateTaxRate
+            LIMIT 0, 1000;
+        `;
+
+        // Execute query with voucherId as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No HSN tax details found for this voucher' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching HSN tax details:', error);
+        res.status(500).json({ error: 'Error fetching HSN tax details' });
+    }
+});
+
+
+/**Receipt Note**/
+
+app.get('/api/rcptnote_voucher/:invoiceId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { invoiceId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch a specific purchase voucher based on invoiceId
+        const sql = 'SELECT * FROM rcptnote_vouchers WHERE vouchernumber = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [invoiceId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'rcptnote voucher not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/rcptnote_inventory', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch items from purchase_inventory along with HSN details
+        const sql = `
+            SELECT 
+                pi.itemName, 
+                pi.quantity, 
+                pi.rate, 
+                pi.discount, 
+                pi.amount,
+                si.name AS stockItemName,
+                sgd.hsn AS hsnCode,
+                sgd.gstRate AS gstRate
+            FROM 
+                rcptnote_inventory pi
+            JOIN 
+                stockitem si ON pi.itemName = si.name
+            JOIN 
+                sku_gst_details sgd ON si.id = sgd.stockItemId
+            WHERE 
+                pi.voucherId = ?
+        `;
+
+        // Execute query with vouchernumber as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Items not found for this order' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/rcptnote_ledger_entries', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+  
+    if (!companyName || !vouchernumber) {
+      return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+  
+    try {
+      // Generate database name based on organization name
+      const dbName = getDatabaseName(companyName);
+  
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+  
+      // Switch to the selected database
+      await connection.changeUser({ database: dbName });
+  
+      // SQL query to fetch items from sales_inventory based on voucherNumber
+      const sql = 'SELECT particulars, rate, amount FROM rcptnote_ledger_entries WHERE voucherId = ?'; // Adjust query as per your schema
+  
+      // Execute query with vouchernumber as parameter
+      const [results] = await connection.query(sql, [vouchernumber]);
+  
+      // Release the connection back to the pool
+      connection.release();
+  
+      // Check if items were found
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Items not found for this order' });
+      }
+  
+      // Send fetched data as JSON response
+      res.json(results);
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Error fetching data' });
+    }
+  });
+
+app.get('/api/rcptnote_hsn_tax_details', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher ID are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch HSN-wise tax details
+        const sql = `
+            SELECT 
+                HSNCode, 
+                SUM(TaxableValue) AS TaxableValue,
+                CentralTaxRate,
+                SUM(CentralTaxAmount) AS CentralTaxAmount,
+                StateTaxRate,
+                SUM(StateTaxAmount) AS StateTaxAmount,
+                SUM(TotalTaxAmount) AS TotalTaxAmount
+            FROM (
+                SELECT 
+                    sgd.hsn AS HSNCode, 
+                    pi.amount AS TaxableValue,
+                    sgd.gstRate / 2 AS CentralTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS CentralTaxAmount,
+                    sgd.gstRate / 2 AS StateTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS StateTaxAmount,
+                    pi.amount * sgd.gstRate / 100 AS TotalTaxAmount
+                FROM 
+                    rcptnote_inventory pi
+                JOIN 
+                    stockitem si ON pi.itemName = si.name
+                JOIN 
+                    sku_gst_details sgd ON si.id = sgd.stockItemId
+                WHERE 
+                    pi.voucherId = ?
+            ) AS subquery
+            GROUP BY 
+                HSNCode, CentralTaxRate, StateTaxRate
+            LIMIT 0, 1000;
+        `;
+
+        // Execute query with voucherId as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No HSN tax details found for this voucher' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching HSN tax details:', error);
+        res.status(500).json({ error: 'Error fetching HSN tax details' });
+    }
+});
+
+
+
+/** Purchase**/
+app.get('/api/purchase_inventory', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch items from purchase_inventory along with HSN details
+        const sql = `
+            SELECT 
+                pi.itemName, 
+                pi.quantity, 
+                pi.rate, 
+                pi.discount, 
+                pi.amount,
+                si.name AS stockItemName,
+                sgd.hsn AS hsnCode,
+                sgd.gstRate AS gstRate
+            FROM 
+                purchase_inventory pi
+            JOIN 
+                stockitem si ON pi.itemName = si.name
+            JOIN 
+                sku_gst_details sgd ON si.id = sgd.stockItemId
+            WHERE 
+                pi.voucherId = ?
+        `;
+
+        // Execute query with vouchernumber as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Items not found for this invoice' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/purchase_ledger_entries', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+  
+    if (!companyName || !vouchernumber) {
+      return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+  
+    try {
+      // Generate database name based on organization name
+      const dbName = getDatabaseName(companyName);
+  
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+  
+      // Switch to the selected database
+      await connection.changeUser({ database: dbName });
+  
+      // SQL query to fetch items from sales_inventory based on voucherNumber
+      const sql = 'SELECT particulars, rate, amount FROM purchase_ledger_entries WHERE voucherId = ?'; // Adjust query as per your schema
+  
+      // Execute query with vouchernumber as parameter
+      const [results] = await connection.query(sql, [vouchernumber]);
+  
+      // Release the connection back to the pool
+      connection.release();
+  
+      // Check if items were found
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Items not found for this invoice' });
+      }
+  
+      // Send fetched data as JSON response
+      res.json(results);
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Error fetching data' });
+    }
+  });
+
+app.get('/api/purc_hsn_tax_details', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher ID are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch HSN-wise tax details
+        const sql = `
+            SELECT 
+                HSNCode, 
+                SUM(TaxableValue) AS TaxableValue,
+                CentralTaxRate,
+                SUM(CentralTaxAmount) AS CentralTaxAmount,
+                StateTaxRate,
+                SUM(StateTaxAmount) AS StateTaxAmount,
+                SUM(TotalTaxAmount) AS TotalTaxAmount
+            FROM (
+                SELECT 
+                    sgd.hsn AS HSNCode, 
+                    pi.amount AS TaxableValue,
+                    sgd.gstRate / 2 AS CentralTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS CentralTaxAmount,
+                    sgd.gstRate / 2 AS StateTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS StateTaxAmount,
+                    pi.amount * sgd.gstRate / 100 AS TotalTaxAmount
+                FROM 
+                    purchase_inventory pi
+                JOIN 
+                    stockitem si ON pi.itemName = si.name
+                JOIN 
+                    sku_gst_details sgd ON si.id = sgd.stockItemId
+                WHERE 
+                    pi.voucherId = ?
+            ) AS subquery
+            GROUP BY 
+                HSNCode, CentralTaxRate, StateTaxRate
+            LIMIT 0, 1000;
+        `;
+
+        // Execute query with voucherId as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No HSN tax details found for this voucher' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching HSN tax details:', error);
+        res.status(500).json({ error: 'Error fetching HSN tax details' });
+    }
+});
+ 
+app.get('/api/ledger_and_address', async (req, res) => {
+    const { companyName, ledgerName } = req.query;
+
+    if (!companyName || !ledgerName) {
+        return res.status(400).json({ error: 'Company name and ledger name are required' });
+    }
+
+    try {
+        // Generate database name based on company name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch ledger and address details
+        const sql = `
+            SELECT 
+                l.*,
+                la.addressLine1,
+                la.addressLine2,
+                la.city,
+                la.state,
+                la.postalCode,
+                la.country
+            FROM 
+                ledger l
+            LEFT JOIN 
+                ledger_address la ON l.id = la.ledgerId
+            WHERE 
+                l.ledgername = ?;
+        `;
+
+        // Execute query with ledgerName as parameter
+        const [results] = await connection.query(sql, [ledgerName]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No ledger details found' });
+        }
+
+        // Consolidate data to remove duplicates
+        const consolidatedResult = results.reduce((acc, row) => {
+            if (!acc.id) {
+                acc = { ...row };
+            } else {
+                // Merge address details
+                acc.addressLine1 = row.addressLine1 || acc.addressLine1;
+                acc.addressLine2 = row.addressLine2 || acc.addressLine2;
+                acc.city = row.city || acc.city;
+                acc.state = row.state || acc.state;
+                acc.postalCode = row.postalCode || acc.postalCode;
+                acc.country = row.country || acc.country;
+            }
+            return acc;
+        }, {});
+
+        // Send consolidated data as JSON response
+        res.json(consolidatedResult);
+
+    } catch (error) {
+        console.error('Error fetching ledger details:', error);
+        res.status(500).json({ error: 'Error fetching ledger details' });
+    }
+});
+/** Puchase **/
+
+
+/** Sales A4 Print**/
+app.get('/api/sales_voucher/:invoiceId', async (req, res) => {
+    const { companyName } = req.query;
+
+    if (!companyName) {
+        return res.status(400).json({ error: 'Company name is required' });
+    }
+
+    const { invoiceId } = req.params; // Extract invoiceId from URL parameters
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch a specific purchase voucher based on invoiceId
+        const sql = 'SELECT * FROM sales_vouchers WHERE vouchernumber = ?'; // Adjust query as per your schema
+
+        // Execute query with invoiceId as parameter
+        const [results] = await connection.query(sql, [invoiceId]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if a voucher was found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'sales voucher not found' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results[0]); // Assuming only one result is expected
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/sales_inventory', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch items from purchase_inventory along with HSN details
+        const sql = `
+            SELECT 
+                pi.itemName, 
+                pi.quantity, 
+                pi.rate, 
+                pi.discount, 
+                pi.amount,
+                si.name AS stockItemName,
+                sgd.hsn AS hsnCode,
+                sgd.gstRate AS gstRate
+            FROM 
+                sales_inventory pi
+            JOIN 
+                stockitem si ON pi.itemName = si.name
+            JOIN 
+                sku_gst_details sgd ON si.id = sgd.stockItemId
+            WHERE 
+                pi.voucherId = ?
+        `;
+
+        // Execute query with vouchernumber as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Items not found for this order' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        res.status(500).json({ error: 'Error fetching data' });
+    }
+});
+
+app.get('/api/sales_ledger_entries', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+  
+    if (!companyName || !vouchernumber) {
+      return res.status(400).json({ error: 'Company name and voucher number are required' });
+    }
+  
+    try {
+      // Generate database name based on organization name
+      const dbName = getDatabaseName(companyName);
+  
+      // Get a connection from the pool
+      const connection = await pool.getConnection();
+  
+      // Switch to the selected database
+      await connection.changeUser({ database: dbName });
+  
+      // SQL query to fetch items from sales_inventory based on voucherNumber
+      const sql = 'SELECT particulars, rate, amount FROM sales_ledger_entries WHERE voucherId = ?'; // Adjust query as per your schema
+  
+      // Execute query with vouchernumber as parameter
+      const [results] = await connection.query(sql, [vouchernumber]);
+  
+      // Release the connection back to the pool
+      connection.release();
+  
+      // Check if items were found
+      if (results.length === 0) {
+        return res.status(404).json({ error: 'Items not found for this order' });
+      }
+  
+      // Send fetched data as JSON response
+      res.json(results);
+  
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      res.status(500).json({ error: 'Error fetching data' });
+    }
+  });
+
+app.get('/api/sales_hsn_tax_details', async (req, res) => {
+    const { companyName, vouchernumber } = req.query;
+
+    if (!companyName || !vouchernumber) {
+        return res.status(400).json({ error: 'Company name and voucher ID are required' });
+    }
+
+    try {
+        // Generate database name based on organization name
+        const dbName = getDatabaseName(companyName);
+
+        // Get a connection from the pool
+        const connection = await pool.getConnection();
+
+        // Switch to the selected database
+        await connection.changeUser({ database: dbName });
+
+        // SQL query to fetch HSN-wise tax details
+        const sql = `
+            SELECT 
+                HSNCode, 
+                SUM(TaxableValue) AS TaxableValue,
+                CentralTaxRate,
+                SUM(CentralTaxAmount) AS CentralTaxAmount,
+                StateTaxRate,
+                SUM(StateTaxAmount) AS StateTaxAmount,
+                SUM(TotalTaxAmount) AS TotalTaxAmount
+            FROM (
+                SELECT 
+                    sgd.hsn AS HSNCode, 
+                    pi.amount AS TaxableValue,
+                    sgd.gstRate / 2 AS CentralTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS CentralTaxAmount,
+                    sgd.gstRate / 2 AS StateTaxRate,
+                    pi.amount * (sgd.gstRate / 2) / 100 AS StateTaxAmount,
+                    pi.amount * sgd.gstRate / 100 AS TotalTaxAmount
+                FROM 
+                    sales_inventory pi
+                JOIN 
+                    stockitem si ON pi.itemName = si.name
+                JOIN 
+                    sku_gst_details sgd ON si.id = sgd.stockItemId
+                WHERE 
+                    pi.voucherId = ?
+            ) AS subquery
+            GROUP BY 
+                HSNCode, CentralTaxRate, StateTaxRate
+            LIMIT 0, 1000;
+        `;
+
+        // Execute query with voucherId as parameter
+        const [results] = await connection.query(sql, [vouchernumber]);
+
+        // Release the connection back to the pool
+        connection.release();
+
+        // Check if items were found
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'No HSN tax details found for this voucher' });
+        }
+
+        // Send fetched data as JSON response
+        res.json(results);
+
+    } catch (error) {
+        console.error('Error fetching HSN tax details:', error);
+        res.status(500).json({ error: 'Error fetching HSN tax details' });
+    }
+});
+
+
 
 
 

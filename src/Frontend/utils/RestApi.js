@@ -252,6 +252,27 @@ export const createPurcOrderVoucher = async (data) => {
   }
 };
 
+
+export const createReceiptNoteVoucher = async (data) => {
+  try {
+    const response = await axios.post(`${BASE_URL}/create-rcptnote-voucher`, data, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+
+    return response.data;
+  } catch (error) {
+    console.error('Error:', error);
+    throw error;
+  }
+};
+
+
+
+
+
 //prashanth code
 
 export const createSalesman = async (data) => {

@@ -6,7 +6,6 @@ import axios from 'axios';
 import { Form, Input, Button, Select, Divider,message } from 'antd';
 //import { createStockcategory, fetchStockcategory } from '../../utils/RestApi'; // Assuming correct import path
 import { AppContext } from '../../../Context/AppContext';
-import '../../../styles/StockcategForm.css';
 
 
 const { Option } = Select;
@@ -50,7 +49,7 @@ const StockcategoryForm = () => {
 const onFinish = async (values) => {
   setLoading(true);
   try {
-      const response = await axios.post('http://localhost:5000/api/create-Stockcategory', {
+      const response = await axios.post(BASE_URL+'/create-Stockcategory', {
         ...values,
         companyName: companyName
       });

@@ -9,6 +9,7 @@ import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider,
 import '../../../styles/Formliststyle/Commonform.css';
 import '../../../styles/Formliststyle/Tableform.css';
 import { Message } from 'semantic-ui-react';
+import {BASE_URL} from '../../utils/Ipurl';
 
 const { Option } = Select;
 
@@ -46,7 +47,7 @@ const GodownList = ({ onSelectGodown}) => {
     const fetchGodown = async () => {
       setLoading(true);
       try {
-        const response = await axios.get('http://localhost:5000/api/Godownlist', {
+        const response = await axios.get(BASE_URL+'/Godownlist', {
           params: {
             companyName: companyName,
             page: currentPage,
@@ -89,7 +90,7 @@ const GodownList = ({ onSelectGodown}) => {
 useEffect(() => {
   const fetchGodownFromDatabase = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/Godown_edit/${editGodownId}`, {
+      const response = await axios.get(BASE_URL+`/Godown_edit/${editGodownId}`, {
         params: {
           companyName: companyName,
         }
@@ -118,7 +119,7 @@ useEffect(() => {
 useEffect(() => {
   const fetchGodownFromDatabase = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/Godown_delete/${deleteGodownId}`, {
+      const response = await axios.get(BASE_URL+`/Godown_delete/${deleteGodownId}`, {
         params: {
           companyName: companyName,
         }
@@ -238,7 +239,7 @@ useEffect(() => {
   //Modal Submit
   const handleSubmitEdit = async() => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/update-Godown`, {
+      const response = await axios.put(BASE_URL+`/update-Godown`, {
         Godownname: Godownname,       // Assuming groupName, groupAlias, and parentGroup are defined states
         Godownalias: Godownalias,
         Godowngroup: Godowngroup,
@@ -265,7 +266,7 @@ useEffect(() => {
    //Modal Submit
    const handleSubmitdelete = async() => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/delete-Godown`, {
+      const response = await axios.put(BASE_URL+`/delete-Godown`, {
         Godownname: Godownname,       // Assuming groupName, groupAlias, and parentGroup are defined states
         Godownalias: Godownalias,
         Godowngroup: Godowngroup,
@@ -301,7 +302,7 @@ useEffect(() => {
  } 
   const refreshGodownList = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/Godownlist', {
+      const response = await axios.get(BASE_URL+'/Godownlist', {
         params: {
           companyName: companyName,
           page: currentPage,

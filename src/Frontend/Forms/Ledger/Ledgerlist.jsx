@@ -3,10 +3,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
-
-
-import '../../../styles/Formliststyle/Commonform.css';
-import '../../../styles/Formliststyle/Tableform.css';
+import '../../../styles/LedgerList.css';
 
 const LedgerList = ({ onSelectLedger }) => {
   const { companyName } = useContext(AppContext);
@@ -39,7 +36,7 @@ const LedgerList = ({ onSelectLedger }) => {
       setLoading(true);
 
       try {
-        const response = await axios.get('http://localhost:5000/api/ledgers', {
+        const response = await axios.get(BASE_URL+'/ledgers', {
           params: {
             companyName: companyName,
             page: currentPage,
@@ -63,7 +60,7 @@ const LedgerList = ({ onSelectLedger }) => {
   useEffect(() => {
     const fetchSalesmanFromDatabase = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/ledger_delete/${deleteledgerId}`, {
+        const response = await axios.get(BASE_URL+`/ledger_delete/${deleteledgerId}`, {
           params: {
             companyName: companyName,
           }
@@ -148,7 +145,7 @@ const LedgerList = ({ onSelectLedger }) => {
   const openEditModal = async (ledgerId) => {
     console.log(`Open edit modal for ledger with ID: ${ledgerId}`);
     try {
-      const response = await axios.get(`http://localhost:5000/api/ledgers_edit/${ledgerId}`, {
+      const response = await axios.get(BASE_URL+`/ledgers_edit/${ledgerId}`, {
         params: { companyName }
       });
       setCurrentLedger(response.data);
@@ -160,7 +157,7 @@ const LedgerList = ({ onSelectLedger }) => {
 
   const handleEditModalOk = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/ledgers_update/${currentLedger.id}`, currentLedger, {
+      await axios.put(BASE_URL+`/ledgers_update/${currentLedger.id}`, currentLedger, {
         params: { companyName: companyName },
         headers: {
           'Content-Type': 'application/json'
@@ -170,7 +167,7 @@ const LedgerList = ({ onSelectLedger }) => {
       setIsEditModalVisible(false);
       setCurrentLedger(null);
       // Refresh the ledger list
-      const response = await axios.get('http://localhost:5000/api/ledgers', {
+      const response = await axios.get(BASE_URL+'/ledgers', {
         params: {
           companyName: companyName,
           page: currentPage,
@@ -193,7 +190,7 @@ const LedgerList = ({ onSelectLedger }) => {
   const opendeleteModal = async (ledgerId) => {
     console.log(`Open edit modal for ledger with ID: ${ledgerId}`);
     try {
-      const response = await axios.get(`http://localhost:5000/api/ledger_delete/${ledgerId}`, {
+      const response = await axios.get(BASE_URL+`/ledger_delete/${ledgerId}`, {
         params: { companyName }
       });
       setCurrentLedger(response.data);
@@ -212,7 +209,7 @@ const LedgerList = ({ onSelectLedger }) => {
   //Modal Submit // Prashanth code  delete 
   const handleSubmitdelete = async() => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/delete-ledger`, {
+      const response = await axios.put(BASE_URL+`/delete-ledger`, {
         id : currentLedger.id,
         databaseName:companyName
       });
@@ -221,7 +218,7 @@ const LedgerList = ({ onSelectLedger }) => {
         message.success('Ledger Deleted successfully!');
         console.log('Ledger Deleted successfully');
        // Refresh the ledger list
-      const response = await axios.get('http://localhost:5000/api/ledgers', {
+      const response = await axios.get(BASE_URL+'/ledgers', {
         params: {
           companyName: companyName,
           page: currentPage,
