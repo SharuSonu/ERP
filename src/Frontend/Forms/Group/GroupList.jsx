@@ -206,7 +206,7 @@ useEffect(() => {
       render: (_, record) => (
         <div className="btn-group" role="group" aria-label="Actions">
           <Button
-            type="default"
+             type="default"
             className="edit-button"
             onClick={() => openEditModal(record.id)}
           >
@@ -344,8 +344,13 @@ useEffect(() => {
   const pageSizeOptions = ['5', '10', '20', '50'];
 
   return (
+  
+    
+  
     <div className="container">
       <h2>𝑮𝒓𝒐𝒖𝒑 𝑳𝒊𝒔𝒕</h2>
+
+      
 
       <div className="search-bar-container">
       <Input.Search
@@ -428,9 +433,10 @@ useEffect(() => {
         ]}
       >
 </Modal>
-        
+   
       <Divider />
     </div>
+    
   );
 };
 

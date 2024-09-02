@@ -1,8 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Select from 'react-select';
-import { Formik, Form, Field, FieldArray } from 'formik';
-import { Button, Divider,message } from 'antd';
-import { DeleteOutlined } from '@ant-design/icons';
+import { Formik, Form, Field, FieldArray} from 'formik';
+import {Row, Col, Button, Divider,message, Modal,Input,Radio } from 'antd';
+import { DeleteOutlined, SettingOutlined  } from '@ant-design/icons';
 //import '../../../styles/Invoice/InvoiceForm.css';
 import '../../../styles/Vouchercreation.css';
 import { createSalesVoucher } from '../../utils/RestApi';
@@ -29,6 +29,7 @@ const getCurrentDateFormatted = () => {
   const yyyy = currentDate.getFullYear();
   return `${yyyy}-${mm}-${dd}`;
 };
+
 
 const initialValues = {
   voucherTypeName: 'Sales',
@@ -58,6 +59,15 @@ const InvoiceForm = () => {
   const [taxInfo, setTaxInfo] = useState([]);
   const [vchDate, setVchDate] = useState(getCurrentDateFormatted());
   const [DiscountLimit, setDiscountLimit] = useState(0);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalValue, setModalValue] = useState('');
+  const [autoGenerate, setAutoGenerate] = useState(true);
+  const [prefix, setPrefix] = useState('VCH-'); // Default prefix
+  const [nextNumber, setNextNumber] = useState(''); // Default empty
+  const [manualNumber, setManualNumber] = useState('');
+
+
+  
 
   
   const handleSetupDatabase = async () => {
@@ -477,29 +487,52 @@ useEffect(() => {
     
   };
 
-  const handleReset = (resetForm, setFieldValue) => {
-    resetForm({ values: initialValues });
-    fetchVoucherNumber().then(newVoucherNumber => setFieldValue('voucherNumber', newVoucherNumber));
+  // Fetch the next voucher number
+  const fetchVoucherNumber = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/sales_vouchers/last', {
+        params: { companyName }
+      });
+      const lastVoucherNumber = response.data.vouchernumber;
+      const currvchno = Number(lastVoucherNumber) + 1;
+      return currvchno.toString();
+    } catch (error) {
+      console.error('Failed to fetch the voucher number:', error);
+      return '0000'; // Default value in case of failure
+    }
   };
 
+  // Handle form reset
+  const handleReset = async (resetForm, setFieldValue) => {
+    resetForm({ values: initialValues });
+    if (autoGenerate) {
+      const newVoucherNumber = await fetchVoucherNumber();
+      setFieldValue('voucherNumber', newVoucherNumber);
+      setNextNumber(newVoucherNumber);
+    }
+  };
+
+  // Handle form submission
   const handleSubmit = async (values, actions) => {
     console.log('Form Values:', values);
-    
+
     const voucherData = {
       ...values,
       cmp: companyName,
       voucherNumber: Number(values.voucherNumber),
-      partyAccount: values.supplier.value,
+      partyAccount: values.supplier ? values.supplier.value : '',
     };
-    try {
-      
-      const response = await createSalesVoucher(voucherData);
 
+    try {
+      const response = await createSalesVoucher(voucherData);
       if (response.success) {
         alert('Voucher created successfully');
         actions.resetForm({ values: initialValues });
-        const newVoucherNumber = await fetchVoucherNumber();
-        actions.setFieldValue('voucherNumber', newVoucherNumber);
+        if (autoGenerate) {
+          const newVoucherNumber = await fetchVoucherNumber();
+          actions.setFieldValue('voucherNumber', newVoucherNumber);
+          setNextNumber(newVoucherNumber);
+        }
       } else {
         alert(response.message || 'Failed to create Voucher');
       }
@@ -509,243 +542,228 @@ useEffect(() => {
     }
   };
 
-  const fetchVoucherNumber = async () => {
-    try {
-      handleSetupDatabase();
-      const response = await axios.get('http://localhost:5000/api/sales_vouchers/last', {
-        params: { companyName }
-      });
-      const lastVoucherNumber = response.data.vouchernumber;
-      const currvchno = (Number(lastVoucherNumber) + Number(1));
-      return (currvchno).toString();
-    } catch (error) {
-      console.error('Failed to fetch the voucher number:', error);
-      return '';
+  // Fetch voucher number on mount
+  useEffect(() => {
+    const fetchVoucherNumberOnMount = async () => {
+      const fetchedNumber = await fetchVoucherNumber();
+      setNextNumber(fetchedNumber || '0000');
+    };
+    fetchVoucherNumberOnMount();
+  }, []);
+
+  // Show modal
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  // Handle modal OK
+  const handleOk = (setFieldValue) => {
+    if (autoGenerate) {
+      setFieldValue('voucherNumber', `${prefix}${nextNumber}`);
+    } else {
+      setFieldValue('voucherNumber', manualNumber);
+    }
+    setIsModalVisible(false);
+  };
+
+  // Handle modal cancel
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  // Handle auto-generate change
+  const handleAutoGenerateChange = async (e) => {
+    const isAuto = e.target.value === 'auto';
+    setAutoGenerate(isAuto);
+    if (isAuto) {
+      const fetchedNumber = await fetchVoucherNumber();
+      setNextNumber(fetchedNumber || '0000');
+    } else {
+      setNextNumber('0000');
     }
   };
 
+
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-      {({ values, setFieldValue }) => {
-        useEffect(() => {
-          const fetchVoucherNumberOnMount = async () => {
-            const newVoucherNumber = await fetchVoucherNumber();
-            if (newVoucherNumber !== 'NaN')
-              setFieldValue('voucherNumber', newVoucherNumber);
-            else
-              setFieldValue('voucherNumber', 1);
-          };
-          fetchVoucherNumberOnMount();
-        }, [companyName, setFieldValue]);
+    <Formik
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+    >
+      {({ values, setFieldValue, resetForm }) => (
+        <Form className="sales-form">
+          <div className="form-header">
+            <h2>Sales Voucher</h2>
+          </div>
 
-        return (
-          <Form className="sales-form">
-            <div className="form-header">
-              <h2>Sales Voucher</h2>
-            </div>
-
-            <div className="form-sections">
-              <div className="form-row">
-                <label>Voucher Type Name:</label>
-                <Field name="voucherTypeName" type="text" readOnly className="field-input" />
+          <Row gutter={16}>
+            <Col span={12}>
+              <div className="form-sections">
+                <div className="form-row">
+                  <label>Voucher Type Name:</label>
+                  <Field name="voucherTypeName" type="text" readOnly className="field-input" />
+                </div>
               </div>
-              
-              <div className="form-row">
-                <label>Voucher Date:</label>
-                <Field
-                  name="voucherDate"
-                  type="date"
-                  className="field-input"
-                  onChange={async (e) => {
-                    const newVoucherDate = e.target.value;
-                    setFieldValue('voucherDate', newVoucherDate);
-                    
-                    // Update rate for all inventory items based on new date
-                    for (let i = 0; i < values.inventory.length; i++) {
-                      const itemName = values.inventory[i].itemName;
-                      if (itemName) {
-                        console.log(itemName);
-                        // await handleItemChange({ label: itemName }, i, setFieldValue, values);
+            </Col>
+
+            <Col span={12}>
+              <div className="form-sections">
+                <div className="form-row">
+                  <label>Voucher Date:</label>
+                  <Field
+                    name="voucherDate"
+                    type="date"
+                    className="field-input"
+                    onChange={async (e) => {
+                      const newVoucherDate = e.target.value;
+                      setFieldValue('voucherDate', newVoucherDate);
+
+                      // Update rate for all inventory items based on new date
+                      for (let i = 0; i < values.inventory.length; i++) {
+                        const itemName = values.inventory[i].itemName;
+                        if (itemName) {
+                          // Handle item change as necessary
+                        }
                       }
-                    }
-                  }}
-                />
+                    }}
+                  />
+                </div>
               </div>
+            </Col>
+          </Row>
+
+          <Col span={12}>
+            <div className="form-sections">
               <div className="form-row">
                 <label>Voucher Number:</label>
-                <Field name="voucherNumber" type="text" className="field-input" />
-              </div>
-            </div>
-
-            <div className="form-sections">
-              <div className="form-row">
-                <label>Party A/c Name:</label>
-                <Select
-                  options={supplierOptions}
-                  onChange={(option) => handleSupplierChange(option, setFieldValue)}
+                <Field
+                  name="voucherNumber"
+                  type="text"
                   className="field-input"
-                  isLoading={loading}
+                  onChange={async (e) => {
+                    const newVoucherNumber = e.target.value;
+                    setFieldValue('voucherNumber', newVoucherNumber);
+                  }}
                 />
-              </div>
-              <div className="form-row">
-                <label>Salesman Name:</label>
-                <Select
-                  options={Salesmanoptions}
-                  onChange={(option) => setFieldValue('salesLedger', option ? option.value : '')}
-                  className="field-input"
-                  isLoading={loading}
-                />
+                <Button
+                  type="primary"
+                  icon={<SettingOutlined />}
+                  onClick={showModal}
+                >
+                  Configure
+                </Button>
               </div>
             </div>
-
-            <div className="form-sections">
-              <div className="form-row">
-                <h3>Inventory Details</h3>
-              </div>
-              <table className="inventory-table">
-                <thead>
-                  <tr>
-                    <th className="item-name-col">Item Name</th>
-                    <th>Quantity</th>
-                    <th style={{ width: '15%' }}>Rate</th>
-                    <th>Discount (%)</th>
-                    <th>Amount</th>
-                    <th>GstRate</th>
-                    <th>Tax Amount</th>
-                    <th> Action</th>
-                  </tr>
-                </thead>
-                <FieldArray name="inventory">
-                  {({ push, remove }) => (
-                    <tbody>
-                      {values.inventory.map((item, index) => (
-                        <tr key={index}>
-                          <td>
-                            <Select
-                              options={inventoryOptions}
-                              onChange={(option) => handleItemChange(option, index, setFieldValue, values)}
-                              className="field-input"
-                              isLoading={loadingProducts}
-                              value={item.itemName}
-                            />
-                            <Field name={`inventory.${index}.productId`} type="hidden" />
-                          </td>
-                          <td>
-                            <Field
-                              name={`inventory.${index}.quantity`}
-                              type="number"
-                              className="field-input"
-                              onChange={(e) => handleFieldChange(e, index, 'quantity', setFieldValue, values)}
-                            />
-                          </td>
-                          <td>
-                            <Field
-                              name={`inventory.${index}.rate`}
-                              type="number"
-                              className="field-input"
-                              onChange={(e) => handleFieldChange(e, index, 'rate', setFieldValue, values)}
-                            />
-                          </td>
-                          <td>
-                            <Field
-                              name={`inventory.${index}.discount`}
-                              type="number"
-                              className="field-input"
-                              onChange={(e) => handleFieldChange(e, index, 'discount', setFieldValue, values)}
-                            />
-                          </td>
-                          <td>
-                            <Field
-                              name={`inventory.${index}.amount`}
-                              type="text"
-                              readOnly
-                              className="field-input"
-                              value={item.amount.toString()}
-                            />
-                          </td>
-                          <td>
-                            <Field
-                              name={`inventory.${index}.gstrate`}
-                              type="number"
-                              readOnly
-                              className="field-input"
-                            />
-                          </td>
-                          <td>
-                            <Field
-                              name={`inventory.${index}.taxamount`}
-                              type="text"
-                              readOnly
-                              className="field-input"
-                            />
-                          </td>
-                          <td>
-                            <Button
-                              type="danger"
-                              icon={<DeleteOutlined />}
-                              onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                      <tr>
-                        <td colSpan="8">
-                          <Button type="dashed" onClick={() => handleAddItem(push)}>
-                            Add Item
-                          </Button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  )}
-                </FieldArray>
-              </table>
-            </div>
-
-            <div className="ledger-entry-section">
-              <div className="legend">
-                <h5>Ledger Entries</h5>
-              </div>
-              <FieldArray name="ledgerEntries">
-                {({ insert, remove, push }) => (
-                  <div>
-                    <table className="ledgerentries-table">
-                      <thead>
-                        <tr>
-                          <th style={{ width: '40%' }}>Particulars</th>
-                          <th style={{ width: '20%' }}>Rate%</th>
-                          <th style={{ width: '30%' }}>Amount</th>
-                          <th style={{ width: '5%' }}>Action</th>
-                        </tr>
-                      </thead>
+          </Col>
+                 
+              <Row gutter={16}>
+                <Col span={12}>
+                  <div className="form-sections">
+                    <div className="form-row">
+                      <label>Party A/c Name:</label>
+                      <Select
+                        options={supplierOptions}
+                        onChange={(option) => handleSupplierChange(option, setFieldValue)}
+                        className="field-input"
+                        loading={loading}
+                      />
+                    </div>
+                  </div>
+                </Col>
+  
+                <Col span={12}>
+                  <div className="form-sections">
+                    <div className="form-row">
+                      <label>Salesman Name:</label>
+                      <Select
+                        options={Salesmanoptions}
+                        onChange={(option) => setFieldValue('salesLedger', option ? option.value : '')}
+                        className="field-input"
+                        loading={loading}
+                      />
+                    </div>
+                  </div>
+                </Col>
+              </Row>
+  
+              <div className="form-sections">
+                <div className="form-row">
+                  <h3>Inventory Details</h3>
+                </div>
+                <table className="inventory-table">
+                  <thead>
+                    <tr>
+                      <th className="item-name-col">Item Name</th>
+                      <th>Quantity</th>
+                      <th style={{ width: '15%' }}>Rate</th>
+                      <th>Discount (%)</th>
+                      <th>Amount</th>
+                      <th>GstRate</th>
+                      <th>Tax Amount</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <FieldArray name="inventory">
+                    {({ push, remove }) => (
                       <tbody>
-                        {values.ledgerEntries.map((entry, index) => (
+                        {values.inventory.map((item, index) => (
                           <tr key={index}>
                             <td>
                               <Select
-                                name={`ledgerEntries.${index}.particulars`}
-                                placeholder="Particulars"
-                                options={ledgerOptions}
-                                onChange={(option) => handleLedgerChange(option, index, setFieldValue, values)}
-                                value={values.ledgerEntries[index].particulars}
-                                className="table-input field-input"
+                                options={inventoryOptions}
+                                onChange={(option) => handleItemChange(option, index, setFieldValue, values)}
+                                className="field-input"
+                                loading={loadingProducts}
+                                value={item.itemName}
+                              />
+                              <Field name={`inventory.${index}.productId`} type="hidden" />
+                            </td>
+                            <td>
+                              <Field
+                                name={`inventory.${index}.quantity`}
+                                type="number"
+                                className="field-input"
+                                onChange={(e) => handleFieldChange(e, index, 'quantity', setFieldValue, values)}
                               />
                             </td>
                             <td>
                               <Field
-                                name={`ledgerEntries.${index}.rate`}
-                                placeholder="Rate"
+                                name={`inventory.${index}.rate`}
                                 type="number"
-                                className="table-input field-input"
-                                onChange={(e) => handleledFieldChange(e, index, 'rate', setFieldValue, values)}
+                                className="field-input"
+                                onChange={(e) => handleFieldChange(e, index, 'rate', setFieldValue, values)}
                               />
                             </td>
                             <td>
                               <Field
-                                name={`ledgerEntries.${index}.amount`}
-                                placeholder="Amount"
+                                name={`inventory.${index}.discount`}
                                 type="number"
-                                value={values.ledgerEntries[index].amount}
-                                className="table-input field-input"
+                                className="field-input"
+                                onChange={(e) => handleFieldChange(e, index, 'discount', setFieldValue, values)}
+                              />
+                            </td>
+                            <td>
+                              <Field
+                                name={`inventory.${index}.amount`}
+                                type="text"
+                                readOnly
+                                className="field-input"
+                                value={item.amount.toString()}
+                              />
+                            </td>
+                            <td>
+                              <Field
+                                name={`inventory.${index}.gstrate`}
+                                type="number"
+                                readOnly
+                                className="field-input"
+                              />
+                            </td>
+                            <td>
+                              <Field
+                                name={`inventory.${index}.taxamount`}
+                                type="text"
+                                readOnly
+                                className="field-input"
                               />
                             </td>
                             <td>
@@ -758,58 +776,168 @@ useEffect(() => {
                           </tr>
                         ))}
                         <tr>
-                          <td colSpan="4">
-                            <Button type="dashed" onClick={() => push({ particulars: '', rate: 0, amount: 0 })}>
-                              Add Entry
+                          <td colSpan="8">
+                            <Button type="dashed" onClick={() => handleAddItem(push)}>
+                              Add Item
                             </Button>
                           </td>
                         </tr>
                       </tbody>
-                    </table>
-                  </div>
-                )}
-              </FieldArray>
-            </div>
-
-            <div className="form-section">
-    
-
-  <div className="form-row">
-    <label htmlFor="options">Payment Type:</label>
-    <Field name="Payment_Type" as="select" className="field-input">
-      <option value="">Not Applicable</option>
-      <option value="Cards">Cards</option>
-      <option value="IMPS">IMPS</option>
-      <option value="UPI">UPI</option>
-      <option value="Cash">Cash</option>
-    </Field>
-  </div>
-</div>
-
-          
+                    )}
+                  </FieldArray>
+                </table>
+              </div>
+  
+              <div className="ledger-entry-section">
+                <div className="legend">
+                  <h5>Ledger Entries</h5>
+                </div>
+                <FieldArray name="ledgerEntries">
+                  {({ insert, remove, push }) => (
+                    <div>
+                      <table className="ledgerentries-table">
+                        <thead>
+                          <tr>
+                            <th style={{ width: '40%' }}>Particulars</th>
+                            <th style={{ width: '20%' }}>Rate%</th>
+                            <th style={{ width: '30%' }}>Amount</th>
+                            <th style={{ width: '5%' }}>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {values.ledgerEntries.map((entry, index) => (
+                            <tr key={index}>
+                              <td>
+                                <Select
+                                  name={`ledgerEntries.${index}.particulars`}
+                                  placeholder="Particulars"
+                                  options={ledgerOptions}
+                                  onChange={(option) => handleLedgerChange(option, index, setFieldValue, values)}
+                                  value={values.ledgerEntries[index].particulars}
+                                  className="table-input field-input"
+                                />
+                              </td>
+                              <td>
+                                <Field
+                                  name={`ledgerEntries.${index}.rate`}
+                                  placeholder="Rate"
+                                  type="number"
+                                  className="table-input field-input"
+                                  onChange={(e) => handleledFieldChange(e, index, 'rate', setFieldValue, values)}
+                                />
+                              </td>
+                              <td>
+                                <Field
+                                  name={`ledgerEntries.${index}.amount`}
+                                  placeholder="Amount"
+                                  type="number"
+                                  value={values.ledgerEntries[index].amount}
+                                  className="table-input field-input"
+                                />
+                              </td>
+                              <td>
+                                <Button
+                                  type="danger"
+                                  icon={<DeleteOutlined />}
+                                  onClick={() => handleRemoveItem(index, remove, values, setFieldValue)}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                          <tr>
+                            <td colSpan="4">
+                              <Button type="dashed" onClick={() => push({ particulars: '', rate: 0, amount: 0 })}>
+                                Add Entry
+                              </Button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </FieldArray>
+              </div>
+  
               <div className="form-section">
-              <div className="form-row">
-                <label>Narration:</label>
-                <Field name="narration" as="textarea" className="field-input" />
+                <div className="form-row">
+                  <label htmlFor="options">Payment Type:</label>
+                  <Field name="Payment_Type" as="select" className="field-input">
+                    <option value="">Not Applicable</option>
+                    <option value="Cards">Cards</option>
+                    <option value="IMPS">IMPS</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Cash">Cash</option>
+                  </Field>
+                </div>
               </div>
+  
+              <div className="form-section">
+                <div className="form-row">
+                  <label>Narration:</label>
+                  <Field name="narration" as="textarea" className="field-input" />
+                </div>
               </div>
-              <div className="form-row">
-                <label>Total Amount:</label>
-                <Field name="totalAmount" type="text" readOnly className="field-input" value={values.totalAmount.toString()} />
-              </div>
-            
+  
+              <Col span={13}> 
+                <div className="form-row">
+                  <label>Total Amount:</label>
+                  <Field name="totalAmount" type="text" readOnly className="field-input" value={values.totalAmount.toString()} />
+                </div>
+              </Col>
+  
+              
+          {/* Modal Component */}
+        <Modal
+          title="Configure Sales Order Preferences"
+          visible={isModalVisible}
+          onOk={() => handleOk(setFieldValue)}
+          onCancel={handleCancel}
+        >
+          <p>Your sales numbers are set on auto-generate mode to save your time. Are you sure about changing this setting?</p>
+          <Radio.Group onChange={handleAutoGenerateChange} value={autoGenerate ? 'auto' : 'manual'}>
+            <Radio value="auto">Continue auto-generating sales numbers</Radio>
+            <Radio value="manual">Enter sales numbers manually</Radio>
+          </Radio.Group>
 
-            <div className="form-actions">
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
+          {autoGenerate ? (
+            <div style={{ marginTop: 16 }}>
+              <label style={{ display: 'block' }}>Prefix:</label>
+              <Input
+                value={prefix}
+                onChange={(e) => setPrefix(e.target.value)}
+                placeholder="Enter prefix"
+              />
+              <label style={{ display: 'block', marginTop: 16 }}>Next Number:</label>
+              <Input
+                type="number"
+                value={nextNumber}
+                onChange={(e) => setNextNumber(e.target.value)}
+                placeholder="Enter next number"
+                disabled={autoGenerate} // Disable input if auto-generating
+              />
             </div>
-            <Divider />
-          </Form>
-        );
-      }}
+          ) : (
+            <div style={{ marginTop: 16 }}>
+              <label style={{ display: 'block' }}>Manual Number:</label>
+              <Input
+                value={manualNumber}
+                onChange={(e) => setManualNumber(e.target.value)}
+                placeholder="Enter manual number"
+              />
+            </div>
+          )}
+        </Modal>
+
+          <div className="form-footer">
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </div>
+        </Form>
+      )}
     </Formik>
   );
 };
+
 
 export default InvoiceForm;

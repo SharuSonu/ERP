@@ -1,10 +1,69 @@
 .login-form-container {
-    max-width: 400px;
-    margin: auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: absolute; 
+    top: 50%; /* Center vertically */
+    left: 68%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Offset for exact centering */
+    width: 80%; /* Adjust width as needed */
+    max-width: 400px; /* Maximum width for better responsiveness */
+    background-color: white;
+    /* border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);  */
+}
+
+.Login-main-part {
+    position: absolute;
+    top: 6;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2; /* Ensure this div is on top */
+    width: auto; /* Adjust width as needed */
+    height: auto; /* Adjust height as needed */
+    display: flex;
+    justify-content: center; /* Center image horizontally */
+    align-items: center; /* Center image vertically */
+   
+}
+
+.Login-main-part img {
+  
+    width: 120%; /* Adjust this percentage to scale the image down */
+    height: auto; /* Maintain the aspect ratio */
+    max-width: 120%; /* Optional: Set a maximum width */
+
+    border-top-left-radius: 15px;
+    border-top-right-radius:  15px;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    overflow: hidden; /* Prevents scrollbars from appearing */
+  }
+
+
+.Login-main-form{
+    position: relative;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    flex-direction: column; 
+} 
+
+
+.Login-title{
+    color: red;
+}
+
+.tallyLogo{
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding-left: 10px;
 }
 
 .login-form-container .ant-form-item {
@@ -16,7 +75,7 @@
     flex-direction: column;
 }
 
-.login-form-container .ant-radio-wrapper {
+.login-form-container .ant-radio-wrapper{
     margin-bottom: 10px;
 }
 

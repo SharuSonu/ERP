@@ -5,8 +5,10 @@ import { createSalesman, fetchSalesman } from '../../utils/RestApi';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
 //import { Table, Form, Button, Modal, Switch } from 'antd';
-import '../../../styles/GroupList.css';
+//import '../../../styles/GroupList.css';
 import { Message } from 'semantic-ui-react';
+import '../../../styles/Formliststyle/Commonform.css';
+import '../../../styles/Formliststyle/Tableform.css';
 
 const { Option } = Select;
 
@@ -175,7 +177,7 @@ useEffect(() => {
       key: 'action',
       visible: columnVisibility.action,
       render: (_, record) => (
-        <div className="btn-Salesman" role="salesman" aria-label="Actions">
+        <div className="btn-group" role="salesman" aria-label="Actions">
           <Button
             type="default"
             className="edit-button"
@@ -319,17 +321,19 @@ useEffect(() => {
   const pageSizeOptions = ['5', '10', '20', '50'];
 
   return (
-    <div className="SalesMan-list">
+    <div className="container">
       <h2>𝑺𝒂𝒍𝒆𝒔 𝑷𝒆𝒓𝒔𝒐𝒏 𝑳𝒊𝒔𝒕</h2>
 
+      <div className="search-bar-container">
       <Input.Search
         className="mb-3"
         placeholder="Search SalesMan Name, SalesMan Info..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-
-      <Row gutter={[16, 16]}>
+</div>
+<Divider />
+<Row className="centered-row" gutter={[16, 16]}>
         {Object.keys(columnVisibility).map((key) => (
           <Col key={key}>
             <Checkbox
@@ -344,13 +348,13 @@ useEffect(() => {
       </Row>
 
       <Divider />
-
+      <div className="table-container">
       <Table
         dataSource={currentSalesman}
         columns={columns}
         pagination={false}
       />
-
+</div>
       <Pagination
         current={currentPage}
         pageSize={pageSize}

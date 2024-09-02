@@ -68,9 +68,9 @@ const LoginForm = () => {
             }
             
         } catch (error) {
-            console.error('Login failed:', error.message);
-            setError(error.message); // Set error message state
-            message.error(error.message); // Show error message using antd message component
+            console.error('Login failed:', error);
+            setError('Invalid username or password'); // Set error message state
+            message.error('Invalid username or password'); // Show error message using antd message component
         }
     };
 
@@ -79,9 +79,15 @@ const LoginForm = () => {
     };
 
     return (
-        <div className="login-form-container">
-            <Divider>INVENTORY MANAGEMENT</Divider>
-            <Form
+    <div className="Login-main-form">
+         <img src="src/assets/images/login/test.jpg" alt="Img" style={{width:'100vw', height:'100vh'}} />
+            
+       <div className='Login-main-part'>
+            <img src="src/assets/images/login/SunIT Logo.png" alt="oops"/>
+
+          <div className="login-form-container">
+             <Divider className='Login-title'>RETAIL MANAGEMENT </Divider>
+             <Form
                 name="login-form"
                 initialValues={{ remember: true }}
                 onFinish={onFinish}
@@ -97,7 +103,7 @@ const LoginForm = () => {
                     name="databaseName"
                     rules={[{ required: true, message: 'Please select a company!' }]}
                 >
-                    <Select placeholder="Select a company">
+                    <Select placeholder="Select a company" style={{Color:'#BFDCF2'}}>
                         {databases.map((database) => (
                             <Option key={database} value={database}>
                                 {database.replace(/^erp_/, '')}
@@ -109,6 +115,7 @@ const LoginForm = () => {
                 <Form.Item
                     name="username"
                     rules={[{ required: true, message: 'Please input your username!' }]}
+                    style={{Color:'#BFDCF2'}}
                 >
                     <Input placeholder="Username" />
                 </Form.Item>
@@ -116,26 +123,33 @@ const LoginForm = () => {
                 <Form.Item
                     name="password"
                     rules={[{ required: true, message: 'Please input your password!' }]}
+                    style={{Color:'#BFDCF2'}}
                 >
                     <Input.Password placeholder="Password" />
                 </Form.Item>
 
                 <Form.Item>
-                    <Button type="primary" htmlType="submit">
+                    <Button type="primary" htmlType="submit" style={{backgroundColor:'#046FB0'}}>
                         Login as {loginType === 'admin' ? 'Admin' : 'User'}
                     </Button>
                 </Form.Item>
 
                 <Form.Item>
-                    <Button type="link" htmlType="button" onClick={handleCreateCompanyAccount}>
+                    <Button type="link" htmlType="button" onClick={handleCreateCompanyAccount} style={{backgroundColor:'#BFDCF2'}}>
                         Create Company Account
                     </Button>
                 </Form.Item>
 
                 {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
             </Form>
-        </div>
+              
+         </div>
+       </div>
+    </div>
+     
     );
 };
+
+
 
 export default LoginForm;
