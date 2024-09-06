@@ -23,6 +23,7 @@ import { Footer } from 'antd/es/layout/layout';
 import LoginForm from './Frontend/Forms/LoginForm';
 import AdminForm from './Frontend/Forms/Admin/AdminForm';
 import UserForm from './Frontend/Forms/Users/UserForm';
+import Rolesconf from './Frontend/Forms/Roles/Rolesconf';
 import TaxesForm from './Frontend/Forms/Taxes/TaxesForm';
 import ProductConfig from './Frontend/Forms/StockItem/ProductConfig';
 import SalesManForm from './Frontend/Forms/SalesMan/SalesManform';
@@ -66,6 +67,7 @@ const App = () => {
                 <Route path="/Admin" element={<AdminForm/>} />
                 <Route path="/Users" element={<UserForm/>} />
                 <Route path="/Taxes" element={<TaxesForm/>} />
+                <Route path="/Rolesconf" element={<Rolesconf/>} />
                 <Route path="/productconfig" element={<ProductConfig/>} />
                 <Route path="/SalesManForm" element={<SalesManForm/>} />
                 <Route path="*" element={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>

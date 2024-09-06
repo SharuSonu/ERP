@@ -135,6 +135,8 @@ const Content = () => {
     }
   };
 
+  
+
   return (
     <div className={`content ${isSidebarCollapsed ? 'collapsed' : ''}`}>
       <div className="header-content">

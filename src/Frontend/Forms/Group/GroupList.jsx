@@ -6,6 +6,7 @@ import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
 import '../../../styles/Formliststyle/Commonform.css';
 import '../../../styles/Formliststyle/Tableform.css';
+import {BASE_URL} from '../../utils/Ipurl';
 
 import { Message } from 'semantic-ui-react';
 

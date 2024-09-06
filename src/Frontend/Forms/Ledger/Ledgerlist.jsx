@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { AppContext } from '../../../Context/AppContext';
 import { Input, Table, Button, message, Pagination, Spin, Alert, Modal, Divider, Checkbox, Row, Col, Form, Select } from 'antd';
 import '../../../styles/LedgerList.css';
+import {BASE_URL} from '../../utils/Ipurl';
 
 const LedgerList = ({ onSelectLedger }) => {
   const { companyName } = useContext(AppContext);

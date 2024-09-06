@@ -78,6 +78,15 @@ const Settings = () => {
         }
     };
 
+    const HandleRolesconf = () => {
+        if (userName === 'admin') {
+            navigate('/Rolesconf');
+          }
+          else{
+            message.warning('Access Denied!');
+        }
+    };
+
 
     const { companyName, setCompanyName } = useContext(AppContext);
     const { userName, setUserName } = useContext(AppContext);
@@ -140,7 +149,7 @@ const Settings = () => {
                                     <div class="sub-menu-item">
                                     <span onClick={handleAdminSettings} style={{cursor: "pointer"}}>Admin</span></div>
                                     <div class="sub-menu-item" onClick={handleUsersSettings} style={{cursor: "pointer"}}>Users</div>
-                                    <div class="sub-menu-item">Roles</div>
+                                    <div class="sub-menu-item"onClick={HandleRolesconf}style={{cursor: "pointer"}}>Roles</div>
                                     <div class="sub-menu-item" onClick={handleSalesMan} style={{cursor: "pointer"}}>SalesMan</div>
                                 </div>
                     </div>

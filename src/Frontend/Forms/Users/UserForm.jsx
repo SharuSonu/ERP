@@ -1,226 +1,165 @@
-import React, { useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-import { Form, Input, Button, message, Space, Table, Pagination, Switch } from 'antd';
-import { UserOutlined, LockOutlined, SearchOutlined } from '@ant-design/icons';
-import { AppContext } from '../../../Context/AppContext';
-import '../../../styles/user.css';
-import Header from '../../components/Header';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
 
-const UserForm = () => {
-  const [loading, setLoading] = useState(false);
-  const [userData, setUserData] = useState([]);
-  const [searchText, setSearchText] = useState('');
-  const [filteredUserData, setFilteredUserData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
-  const [userEnabled, setUserEnabled] = useState(false); // State to track user enablement
-  const { companyName, setCompanyName } = useContext(AppContext);
-  const { userName, setUserName } = useContext(AppContext);
-  const navigate = useNavigate();
+// Define columns with title, dataIndex, and key for each form field
+const columns = [
+  {
+    title: 'User Name',
+    dataIndex: 'userName',
+    key: 'userName',
+  },
+  {
+    title: 'Voucher Type',
+    dataIndex: 'voucherType',
+    key: 'voucherType',
+  },
+  {
+    title: 'Alter',
+    dataIndex: 'alter',
+    key: 'alter',
+    type: 'button-group', // Custom type to handle button groups
+    options: ['enable', 'disable']
+  },
+  {
+    title: 'Display',
+    dataIndex: 'display',
+    key: 'display',
+    type: 'button-group', // Custom type to handle button groups
+    options: ['enable', 'disable']
+  },
+  {
+    title: 'Delete',
+    dataIndex: 'delete',
+    key: 'delete',
+    type: 'button-group', // Custom type to handle button groups
+    options: ['enable', 'disable']
+  }
+];
 
-  useEffect(() => {
-    const storedCompanyName = localStorage.getItem('companyName');
-    if (storedCompanyName) {
-      setCompanyName(storedCompanyName);
-    }
+// Component for managing a user's voucher permissions
+const VoucherPermissionsForm = () => {
+  const [formData, setFormData] = useState({
+    userName: '',
+    voucherType: '',
+    alter: 'disable', // Default to 'disable'
+    display: 'disable', // Default to 'disable'
+    delete: 'disable', // Default to 'disable'
+  });
 
-    const storedUserName = localStorage.getItem('userName');
-    if (storedUserName) {
-      setUserName(storedUserName);
-    }
+  const [feedbackMessage, setFeedbackMessage] = useState('');
 
-    fetchUserData();
-  }, [companyName]); // Run only once when component mounts
-
-  const fetchUserData = async () => {
-    try {
-      if (companyName) {
-        const response = await axios.get('http://localhost:5000/api/users', {
-          params: { companyName: companyName }
-        });
-        setUserData(response.data);
-        setFilteredUserData(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-      message.error('Failed to fetch user data. Please try again.');
-    }
+  // Handle form input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
   };
 
-  const onFinish = async (values) => {
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:5000/api/users-insert', {
-        ...values,
-        companyName: companyName,
-        enabled: userEnabled // Pass user enablement status to API call
-      });
-      console.log('User added:', response.data);
-      message.success('User added successfully!');
-      fetchUserData();
-    } catch (error) {
-      console.error('Error adding user:', error);
-      message.error('Failed to add user. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+  // Handle button clicks for permissions
+  const handlePermissionChange = (permissionType, value) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [permissionType]: value,
+    }));
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-    message.error('Please fill in all required fields.');
-  };
-
-  const navigatetodashboard = () => {
-    navigate('/Dashboard');
-  };
-
-  const handleSearch = (e) => {
-    const value = e.target.value.toLowerCase();
-    setSearchText(value);
-    const filteredData = userData.filter(user => 
-      user.username.toLowerCase().includes(value)
-    );
-    setFilteredUserData(filteredData);
-    setCurrentPage(1);
-  };
-
-  const handlePageChange = (page, pageSize) => {
-    setCurrentPage(page);
-    setPageSize(pageSize);
-  };
-
-  const columns = [
-    {
-      title: 'User Name',
-      dataIndex: 'username',
-      key: 'username',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status) => (
-        <span
-          style={{
-            color: 'white',
-            backgroundColor: status ? 'green' : 'red',
-            padding: '2px 6px',
-            borderRadius: '4px',
-          }}
-        >
-          {status ? 'Active' : 'Inactive'}
-        </span>
-      ),
-    },
-  ];
-
-
-  const handleUserStatusChange = async (userId, checked) => {
-    try {
-      // Update user status in the backend
-      await axios.put(`http://localhost:5000/api/users/${userId}`, {
-        enabled: checked
-      });
-      message.success('User status updated successfully!');
-      // Refresh user data after status change
-      fetchUserData();
-    } catch (error) {
-      console.error('Error updating user status:', error);
-      message.error('Failed to update user status. Please try again.');
-    }
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setFeedbackMessage(`Form submitted with data: ${JSON.stringify(formData)}`);
   };
 
   return (
-    <div className='app'> 
-      <Header className="header"/>
-      <div className="main-container">
-        <div className="form-section">
-          <div className="user-form-container">
-            <h3>Add User</h3>
-            <Form
-              name="userForm"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              layout="vertical"
-              className="user-form"
-            >
-              <Form.Item
-                name="username"
-                label="Username"
-                rules={[{ required: true, message: 'Please enter username' }]}
-              >
-                <Input prefix={<UserOutlined className="site-form-item-icon" />} />
-              </Form.Item>
-
-              <Form.Item
-                name="password"
-                label="Password"
-                rules={[{ required: true, message: 'Please enter password' }]}
-              >
-                <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} />
-              </Form.Item>
-
-              <Form.Item
-                name="enabled"
-                valuePropName="checked"
-                labelCol={{ span: 8 }}
-                wrapperCol={{ span: 16 }}
-                style={{ marginBottom: 0 }} // Remove bottom margin to align with other form items
-                >
-  <Space align="baseline">
-    <span style={{ marginRight: 8 }}>Enable User</span>
-    <Switch onChange={(checked) => setUserEnabled(checked)} />
-  </Space>
-</Form.Item>
-
-              <Form.Item>
-                <Space>
-                  <Button type="primary" htmlType="submit" loading={loading} className='submit-button'>
-                    Add User
-                  </Button>
-                  <Button htmlType="reset" onClick={() => {}} className='reset-button'>
-                    Reset
-                  </Button>
-                  <Button onClick={navigatetodashboard} className="cancel-button">
-                    Cancel
-                  </Button>
-                </Space>
-              </Form.Item>
-            </Form>
+    <div>
+      <h1>Voucher Permissions Form</h1>
+      <form onSubmit={handleSubmit} className="form-container">
+        {columns.map((column) => (
+          <div className="form-field" key={column.key}>
+            <label>{column.title}:</label>
+            {column.type === 'button-group' ? (
+              <div className="button-group">
+                {column.options.map((option) => (
+                  <button
+                    type="button"
+                    key={option}
+                    onClick={() => handlePermissionChange(column.dataIndex, option)}
+                    className={formData[column.dataIndex] === option ? 'selected' : ''}
+                  >
+                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <input
+                type="text"
+                name={column.dataIndex}
+                value={formData[column.dataIndex]}
+                onChange={handleChange}
+                required
+              />
+            )}
           </div>
+        ))}
+        
+        <div className="submit-container">
+          <button type="submit" className="submit-button">Submit</button>
         </div>
-        <div className="table-section">
-          <h3>List of Users</h3>
-          <Input
-            placeholder="Search by username"
-            prefix={<SearchOutlined />}
-            value={searchText}
-            onChange={handleSearch}
-            style={{ marginBottom: 20 }}
-          />
-          <Table
-            className="user-form-table"
-            dataSource={filteredUserData.slice((currentPage - 1) * pageSize, currentPage * pageSize)}
-            columns={columns}
-            rowKey="id"
-            pagination={false}
-          />
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={filteredUserData.length}
-            onChange={handlePageChange}
-            showSizeChanger
-            pageSizeOptions={['5', '10', '20', '50']}
-            showTotal={(total, range) => `${range[0]}-${range[1]} of ${total} items`}
-            style={{ marginTop: 20, textAlign: 'right' }}
-          />
-        </div>
-      </div>
+      </form>
+
+      {/* Feedback Message */}
+      {feedbackMessage && <p>{feedbackMessage}</p>}
+
+      {/* Styles for column layout and button selection */}
+      <style jsx>{`
+        .form-container {
+          display: grid;
+          grid-template-columns: repeat(5, 1fr);
+          gap: 20px;
+          max-width: 800px;
+          margin: auto;
+        }
+        .form-field {
+          display: flex;
+          flex-direction: column;
+        }
+        .button-group {
+          display: flex;
+          gap: 10px;
+        }
+        button {
+          padding: 10px;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          cursor: pointer;
+          background-color: #fff;
+        }
+        .selected {
+          background-color: #007bff;
+          color: white;
+          border: 1px solid #007bff;
+        }
+        label {
+          display: block;
+        }
+        .submit-button {
+          padding: 10px 20px;
+          border: 1px solid #007bff;
+          background-color: #007bff;
+          color: white;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        .submit-button:hover {
+          background-color: #0056b3;
+        }
+        .submit-container {
+          grid-column: span 5;
+          text-align: center;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default UserForm;
+export default VoucherPermissionsForm;

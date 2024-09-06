@@ -1,0 +1,50 @@
+/* General styles */
+.container {
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .title {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  /* Form styles */
+  .ant-form-item {
+    margin-bottom: 16px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+  
+  .ant-switch {
+    margin-left: 8px;
+  }
+  
+  /* Button styles */
+  .ant-btn-primary {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .ant-btn-primary:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Feedback message */
+  .feedback-message {
+    margin-top: 20px;
+    font-size: 16px;
+    color: #333;
+  }
+  
